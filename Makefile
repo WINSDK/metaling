@@ -1,4 +1,4 @@
-CCX = clang++
+CXX = clang++
 
 LDFLAGS = -flto=thin \
 		  -framework Metal \
