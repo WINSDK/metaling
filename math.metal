@@ -1,20 +1,17 @@
 #include <metal_stdlib>
 using namespace metal;
 
-kernel void matmul(
+kernel void add(
         device const float *A,
         device const float *B,
-        device float *C,
-        device const uint &widthA,
-        device const uint &widthB,
+        device float *out,
         uint id [[thread_position_in_grid]]) {
-    uint row = id / widthB;
-    uint col = id % widthB;
-    
-    float sum = 0.0;
-    for (uint i = 0; i < widthA; i++) {
-        sum += A[row * widthA + i] * B[i * widthB + col];
-    }
-    
-    C[id] = sum;
+    out[id] = A[id] + B[id];
+}
+
+kernel void mul(
+        device float *in,
+        device const float &factor,
+        uint id [[thread_position_in_grid]]) {
+    in[id] *= factor;
 }
