@@ -1,13 +1,13 @@
 #pragma once
 
 #include <string_view>
-#include <cstdint>
 #include <vector>
+#include "common.hpp"
 
 struct ComputeFunction;
 struct ComputeKernel;
 
-enum BufferType : uint32_t {
+enum BufferType {
     VAL_IN,
     BUF_IN,
     BUF_OUT,
@@ -15,7 +15,7 @@ enum BufferType : uint32_t {
 
 struct ComputeBuffer {
     void *data;
-    uint64_t size;
+    u64 size;
     BufferType ty;
 };
 
@@ -37,11 +37,11 @@ struct ComputeFunction {
     ComputeFunction() = delete;
     ~ComputeFunction();
 
-    void append_arg_buf_inout(ComputeKernel *kern, void *data, uint64_t size);
-    void append_arg_val(ComputeKernel *kern, void *val, uint64_t size);
-    void append_arg_buf_out(ComputeKernel *kern, void *data, uint64_t size);
+    void append_arg_buf_inout(ComputeKernel *kern, void *data, u64 size);
+    void append_arg_val(ComputeKernel *kern, void *val, u64 size);
+    void append_arg_buf_out(ComputeKernel *kern, void *data, u64 size);
 
     void execute(ComputeKernel *kern);
 };
 
-uint64_t align_size(uint64_t size);
+u64 align_size(u64 size);

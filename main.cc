@@ -17,7 +17,7 @@ void example_add() {
 
     add.execute(&kern);
 
-    for (uint64_t idx = 0; idx < 4; ++idx)
+    for (u64 idx = 0; idx < sizeof(C) / sizeof(float); idx++)
         if (abs(C[idx] - expected_C[idx]) > 0.005)
             error("C[%d] is incorrect: expected %.2f, got %.2f\n", idx, expected_C[idx], C[idx]);
 
@@ -36,7 +36,7 @@ void example_mul() {
     add.append_arg_val(&kern, &factor, sizeof(factor));
     add.execute(&kern);
 
-    for (uint64_t idx = 0; idx < 4; ++idx)
+    for (u64 idx = 0; idx < sizeof(in) / sizeof(float); idx++)
         if (abs(in[idx] - expected_out[idx]) > 0.005)
             error("C[%d] is incorrect: expected %.2f, got %.2f\n", idx, expected_out[idx], in[idx]);
 

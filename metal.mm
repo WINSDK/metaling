@@ -10,7 +10,7 @@
 struct ComputeFunction;
 struct ComputeKernel;
 
-enum BufferType : uint32_t {
+enum BufferType {
     VAL_IN,
     BUF_IN,
     BUF_OUT,
@@ -18,7 +18,7 @@ enum BufferType : uint32_t {
 
 struct ComputeBuffer {
     void *data;
-    uint64_t size;
+    u64 size;
     BufferType ty;
     id<MTLBuffer> mtl;
 };
@@ -41,14 +41,14 @@ struct ComputeFunction {
     ComputeFunction(id<MTLDevice> device, id<MTLLibrary> lib, std::string_view name);
     ~ComputeFunction();
 
-    void append_arg_buf_inout(ComputeKernel *kern, void *data, uint64_t size);
-    void append_arg_val(ComputeKernel *kern, void *val, uint64_t size);
-    void append_arg_buf_out(ComputeKernel *kern, void *data, uint64_t size);
+    void append_arg_buf_inout(ComputeKernel *kern, void *data, u64 size);
+    void append_arg_val(ComputeKernel *kern, void *val, u64 size);
+    void append_arg_buf_out(ComputeKernel *kern, void *data, u64 size);
 
     void execute(ComputeKernel *kern);
 };
 
-void ComputeFunction::append_arg_buf_inout(ComputeKernel *kern, void *data, uint64_t size) {
+void ComputeFunction::append_arg_buf_inout(ComputeKernel *kern, void *data, u64 size) {
     this->bufs.push_back(ComputeBuffer {
         .data = data,
         .size = size,
@@ -57,7 +57,7 @@ void ComputeFunction::append_arg_buf_inout(ComputeKernel *kern, void *data, uint
 }
 
 // More efficient for small values.
-void ComputeFunction::append_arg_val(ComputeKernel *kern, void *val, uint64_t size) {
+void ComputeFunction::append_arg_val(ComputeKernel *kern, void *val, u64 size) {
     this->bufs.push_back(ComputeBuffer {
         .data = val,
         .size = size,
@@ -65,7 +65,7 @@ void ComputeFunction::append_arg_val(ComputeKernel *kern, void *val, uint64_t si
     });
 }
 
-void ComputeFunction::append_arg_buf_out(ComputeKernel *kern, void *data, uint64_t size) {
+void ComputeFunction::append_arg_buf_out(ComputeKernel *kern, void *data, u64 size) {
     this->bufs.push_back(ComputeBuffer {
         .data = data,
         .size = size,
@@ -152,7 +152,7 @@ void ComputeFunction::execute(ComputeKernel *kern) {
 
     [encoder setComputePipelineState:this->pipeline];
 
-    for (uint64_t idx = 0; idx < this->bufs.size(); idx++) {
+    for (u64 idx = 0; idx < this->bufs.size(); idx++) {
         ComputeBuffer& buf = this->bufs[idx];
 
         if (buf.ty == VAL_IN) {
@@ -209,10 +209,8 @@ void ComputeFunction::execute(ComputeKernel *kern) {
     }
 }
 
-
-uint64_t align_size(uint64_t size) {
+u64 align_size(u64 size) {
     if ((size % PAGE_SIZE) != 0)
         size += (PAGE_SIZE - (size % PAGE_SIZE));
-
     return size;
 }
