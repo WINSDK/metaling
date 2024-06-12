@@ -9,7 +9,7 @@ struct ComputeKernel;
 
 enum BufferType {
     VAL_IN,
-    BUF_IN,
+    BUF_INOUT,
     BUF_OUT,
 };
 
@@ -27,12 +27,13 @@ struct ComputeKernel {
     ComputeKernel(std::string_view src_path);
     ~ComputeKernel();
 
-    ComputeFunction get_kernel_func(std::string_view name);
+    ComputeFunction get_function(std::string_view name);
 };
 
 struct ComputeFunction {
     void* pipeline;
     std::vector<ComputeBuffer> bufs;
+    u64 linear_buf_len = 0;
 
     ComputeFunction() = delete;
     ~ComputeFunction();

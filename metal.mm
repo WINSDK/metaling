@@ -12,7 +12,7 @@ struct ComputeKernel;
 
 enum BufferType {
     VAL_IN,
-    BUF_IN,
+    BUF_INOUT,
     BUF_OUT,
 };
 
@@ -31,12 +31,13 @@ struct ComputeKernel {
     ComputeKernel(std::string_view src_path);
     ~ComputeKernel();
 
-    ComputeFunction get_kernel_func(std::string_view name);
+    ComputeFunction get_function(std::string_view name);
 };
 
 struct ComputeFunction {
     id<MTLComputePipelineState> pipeline;
     std::vector<ComputeBuffer> bufs;
+    u64 linear_buf_len = 0;
 
     ComputeFunction(id<MTLDevice> device, id<MTLLibrary> lib, std::string_view name);
     ~ComputeFunction();
@@ -45,6 +46,7 @@ struct ComputeFunction {
     void append_arg_val(ComputeKernel *kern, void *val, u64 size);
     void append_arg_buf_out(ComputeKernel *kern, void *data, u64 size);
 
+    void set_buf_len(u64 len);
     void execute(ComputeKernel *kern);
 };
 
@@ -52,7 +54,7 @@ void ComputeFunction::append_arg_buf_inout(ComputeKernel *kern, void *data, u64 
     this->bufs.push_back(ComputeBuffer {
         .data = data,
         .size = size,
-        .ty = BUF_IN,
+        .ty = BUF_INOUT,
     });
 }
 
@@ -119,7 +121,7 @@ ComputeKernel::~ComputeKernel() {
     [this->lib release];
 }
 
-ComputeFunction ComputeKernel::get_kernel_func(std::string_view name) {
+ComputeFunction ComputeKernel::get_function(std::string_view name) {
     return ComputeFunction(this->device, this->lib, name);
 }
 
@@ -160,7 +162,7 @@ void ComputeFunction::execute(ComputeKernel *kern) {
             continue;
         }
 
-        if (buf.ty == BUF_IN) {
+        if (buf.ty == BUF_INOUT) {
             buf.mtl = [
                 kern->device
                 newBufferWithBytes:buf.data
@@ -183,10 +185,13 @@ void ComputeFunction::execute(ComputeKernel *kern) {
         [encoder setBuffer:buf.mtl offset:0 atIndex:idx];
     }
 
-    MTLSize grid_size = MTLSizeMake(6, 1, 1);
+    if (this->linear_buf_len == 0)
+        error("this->linear_buf_len must set to greater than 0\n");
+
+    MTLSize grid_size = MTLSizeMake(this->linear_buf_len, 1, 1);
     NSUInteger tgroup_size = this->pipeline.maxTotalThreadsPerThreadgroup;
-    if (tgroup_size > 6)
-        tgroup_size = 6;
+    if (tgroup_size > this->linear_buf_len)
+        tgroup_size = this->linear_buf_len;
     MTLSize tgroups_size = MTLSizeMake(tgroup_size, 1, 1);
 
     [encoder dispatchThreadgroups:tgroups_size threadsPerThreadgroup:grid_size];
@@ -197,16 +202,10 @@ void ComputeFunction::execute(ComputeKernel *kern) {
     [cmd_buf waitUntilCompleted];
     [cmd_buf release];
 
-    for (ComputeBuffer &buf : this->bufs) {
-        if (buf.ty != BUF_OUT)
-            continue;
-
-        // Ensure the buffer contents are synchronized for reading.
-        [buf.mtl didModifyRange:NSMakeRange(0, buf.size)];
-
-        // Write back output buffers.
-        memcpy(buf.data, buf.mtl.contents, buf.size);
-    }
+    // Write back the output buffers.
+    for (ComputeBuffer &buf : this->bufs)
+        if (buf.ty == BUF_OUT)
+            memcpy(buf.data, buf.mtl.contents, buf.size);
 }
 
 u64 align_size(u64 size) {
