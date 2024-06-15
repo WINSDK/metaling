@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <vector>
+#include <Metal/Metal.hpp>
 #include "common.hpp"
 
 struct ComputeFunction;
@@ -17,12 +18,13 @@ struct ComputeBuffer {
     void *data;
     u64 size;
     BufferType ty;
+    MTL::Buffer *mtl;
 };
 
 struct ComputeKernel {
-    void* device;
-    void* queue;
-    void* lib;
+    MTL::Device *device;
+    MTL::CommandQueue *queue;
+    MTL::Library *lib;
 
     ComputeKernel(std::string_view src_path);
     ~ComputeKernel();
@@ -31,17 +33,18 @@ struct ComputeKernel {
 };
 
 struct ComputeFunction {
-    void* pipeline;
+    MTL::ComputePipelineState *pipeline;
     std::vector<ComputeBuffer> bufs;
     u64 linear_buf_len = 0;
 
-    ComputeFunction() = delete;
+    ComputeFunction(MTL::Device *device, MTL::Library *lib, std::string_view name);
     ~ComputeFunction();
 
     void append_arg_buf_inout(ComputeKernel *kern, void *data, u64 size);
     void append_arg_val(ComputeKernel *kern, void *val, u64 size);
     void append_arg_buf_out(ComputeKernel *kern, void *data, u64 size);
 
+    void set_buf_len(u64 len);
     void execute(ComputeKernel *kern);
 };
 
