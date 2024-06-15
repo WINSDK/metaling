@@ -1,8 +1,8 @@
 #include <cassert>
-#include "metal.hpp"
 #include "common.hpp"
+#include "metal.hpp"
 
-void buf_cmp(const char* fn, float * got, float* exp, u64 len) {
+void buf_cmp(const char* fn, float* got, float* exp, u64 len) {
     for (u64 idx = 0; idx < len; idx++) {
         if (abs(got[idx] - exp[idx]) > 0.005) {
             fputc('\n', stderr);
@@ -11,8 +11,7 @@ void buf_cmp(const char* fn, float * got, float* exp, u64 len) {
                 fn,
                 idx,
                 exp[idx],
-                got[idx]
-            );
+                got[idx]);
         }
     }
 
@@ -71,7 +70,7 @@ void example_mul(ComputeKernel* kern) {
     buf_cmp(__func__, in, exp, buf_len);
 }
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char* argv[]) {
     auto kern_path = std::string(ROOT_DIR) + "/src/math.metal";
     ComputeKernel kern = ComputeKernel(kern_path);
 

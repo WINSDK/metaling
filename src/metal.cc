@@ -1,5 +1,5 @@
-#include <filesystem>
 #include <cstdio>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 
@@ -14,16 +14,16 @@ namespace fs = std::filesystem;
 
 constexpr auto get_metal_version() {
 #if defined METAL_3_2
-  return MTL::LanguageVersion3_2;
+    return MTL::LanguageVersion3_2;
 #elif defined METAL_3_1
-  return MTL::LanguageVersion3_1;
+    return MTL::LanguageVersion3_1;
 #else
-  return MTL::LanguageVersion3_0;
+    return MTL::LanguageVersion3_0;
 #endif
 }
 
-void ComputeFunction::append_arg_buf_inout(ComputeKernel *kern, void *data, u64 size) {
-    this->bufs.push_back(ComputeBuffer {
+void ComputeFunction::append_arg_buf_inout(ComputeKernel* kern, void* data, u64 size) {
+    this->bufs.push_back(ComputeBuffer{
         .data = data,
         .size = size,
         .ty = BUF_INOUT,
@@ -31,23 +31,23 @@ void ComputeFunction::append_arg_buf_inout(ComputeKernel *kern, void *data, u64 
 }
 
 // More efficient for small values.
-void ComputeFunction::append_arg_val(ComputeKernel *kern, void *val, u64 size) {
-    this->bufs.push_back(ComputeBuffer {
+void ComputeFunction::append_arg_val(ComputeKernel* kern, void* val, u64 size) {
+    this->bufs.push_back(ComputeBuffer{
         .data = val,
         .size = size,
         .ty = VAL_IN,
     });
 }
 
-void ComputeFunction::append_arg_buf_out(ComputeKernel *kern, void *data, u64 size) {
-    this->bufs.push_back(ComputeBuffer {
+void ComputeFunction::append_arg_buf_out(ComputeKernel* kern, void* data, u64 size) {
+    this->bufs.push_back(ComputeBuffer{
         .data = data,
         .size = size,
         .ty = BUF_OUT,
     });
 }
 
-MTL::Library* metal_read_lib(MTL::Device *device, std::string_view path) {
+MTL::Library* metal_read_lib(MTL::Device* device, std::string_view path) {
     if (!fs::exists(path) || !fs::is_regular_file(path))
         error("source '%s' does not exist or is not a regular file.\n", path.data());
 
@@ -99,9 +99,9 @@ ComputeFunction ComputeKernel::get_function(std::string_view name) {
     return ComputeFunction(this->device, this->lib, name);
 }
 
-ComputeFunction::ComputeFunction(MTL::Device *device, MTL::Library *lib, std::string_view name) {
+ComputeFunction::ComputeFunction(MTL::Device* device, MTL::Library* lib, std::string_view name) {
     auto nname = NS::String::string(name.data(), NS::UTF8StringEncoding);
-    MTL::Function *func = lib->newFunction(nname);
+    MTL::Function* func = lib->newFunction(nname);
 
     if (!func)
         error("function '%s' not found\n", name.data());
@@ -118,11 +118,11 @@ ComputeFunction::ComputeFunction(MTL::Device *device, MTL::Library *lib, std::st
 
 ComputeFunction::~ComputeFunction() {
     this->pipeline->release();
-    for (ComputeBuffer &buf : this->bufs)
+    for (ComputeBuffer& buf : this->bufs)
         buf.mtl->release();
 }
 
-void ComputeFunction::execute(ComputeKernel *kern) {
+void ComputeFunction::execute(ComputeKernel* kern) {
     MTL::CommandBuffer* cmd_buf = kern->queue->commandBuffer();
     MTL::ComputeCommandEncoder* encoder = cmd_buf->computeCommandEncoder();
 
@@ -160,13 +160,13 @@ void ComputeFunction::execute(ComputeKernel *kern) {
     encoder->dispatchThreadgroups(tgroups_size, grid_size);
     encoder->endEncoding();
     encoder->release();
-    
+
     cmd_buf->commit();
     cmd_buf->waitUntilCompleted();
     cmd_buf->release();
 
     // Write back the output buffers.
-    for (ComputeBuffer &buf : this->bufs)
+    for (ComputeBuffer& buf : this->bufs)
         if (buf.ty == BUF_OUT)
             memcpy(buf.data, buf.mtl->contents(), buf.size);
 }

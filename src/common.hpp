@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <Metal/Metal.hpp>
+#include <cstdint>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -16,5 +16,5 @@ typedef int64_t i64;
 typedef float f32;
 typedef double f64;
 
-void error(const char * fmt, ...);
-void error_metal(NS::Error* err, const char * fmt, ...);
+void error(const char* fmt, ...);
+void error_metal(NS::Error* err, const char* fmt, ...);
