@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <Metal/Metal.hpp>
 
-void error(const char * fmt, ...) {
+[[noreturn]] void error(const char * fmt, ...) {
     va_list arglist;
 
     va_start(arglist, fmt);
@@ -14,7 +14,7 @@ void error(const char * fmt, ...) {
     _exit(1);
 }
 
-void error_metal(NS::Error* err, const char * fmt, ...) {
+[[noreturn]] void error_metal(NS::Error* err, const char * fmt, ...) {
     va_list arglist;
 
     va_start(arglist, fmt);

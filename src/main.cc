@@ -1,6 +1,8 @@
 #include <cassert>
+#include <string>
 #include "common.hpp"
 #include "metal.hpp"
+#include "hash.hpp"
 
 void buf_cmp(const char* fn, float* got, float* exp, u64 len) {
     for (u64 idx = 0; idx < len; idx++) {
@@ -74,10 +76,22 @@ int main(int argc, const char* argv[]) {
     auto kern_path = std::string(ROOT_DIR) + "/src/math.metal";
     ComputeKernel kern = ComputeKernel(kern_path);
 
-    printf("tests:\n");
-    example_add(&kern);
-    example_mul_buffered(&kern);
-    example_mul(&kern);
+    // printf("tests:\n");
+    // example_add(&kern);
+    // example_mul_buffered(&kern);
+    // example_mul(&kern);
+
+    u8 mac_ap[6];
+    hash::mac_to_bytes("00:11:22:33:44:55", mac_ap);
+
+    u8 mac_sta[6];
+    hash::mac_to_bytes("66:77:88:99:AA:BB", mac_sta);
+
+    u32 hash[5];
+    hash::pmkid("lol", mac_ap, mac_sta, hash);
+
+    std::string out = hash::bytes_to_digest(reinterpret_cast<u8*>(hash), 20);
+    printf("outer_hash: %s\n", out.c_str());
 
     return 0;
 }

@@ -77,10 +77,13 @@ endif()
 # Turn on -flto.
 # set_property(TARGET metaling PROPERTY INTERPROCEDURAL_OPTIMIZATION ON)
 
-# Turn on address sanitzer.
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # Turn on address sanitzer.
     target_compile_options(metaling PRIVATE -fsanitize=address -fsanitize=undefined)
     target_link_options(metaling PRIVATE -fsanitize=address -fsanitize=undefined)
+
+    # Disable frame pointers.
+    target_compile_options(metaling PRIVATE -fno-omit-frame-pointer)
 endif()
 
 target_compile_options(metaling PRIVATE
@@ -99,5 +102,6 @@ target_compile_options(metaling PRIVATE
 target_sources(metaling PRIVATE
     src/main.cc
     src/metal.cc
+    src/hash.cc
     src/common.cc
 )
