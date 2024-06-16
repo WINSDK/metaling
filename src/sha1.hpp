@@ -36,7 +36,6 @@ typedef struct {
 	uint32_t ihv[5];
 	unsigned char buffer[64];
 	int found_collision;
-	int safe_hash;
 	int detect_coll;
 	int ubc_check;
 	int reduced_round_coll;
@@ -51,21 +50,6 @@ typedef struct {
 
 /* Initialize SHA-1 context. */
 void SHA1DCInit(SHA1_CTX*);
-
-/*
-    Function to enable safe SHA-1 hashing:
-    Collision attacks are thwarted by hashing a detected near-collision block 3 times.
-    Think of it as extending SHA-1 from 80-steps to 240-steps for such blocks:
-        The best collision attacks against SHA-1 have complexity about 2^60,
-        thus for 240-steps an immediate lower-bound for the best cryptanalytic attacks would be 2^180.
-        An attacker would be better off using a generic birthday search of complexity 2^80.
-
-   Enabling safe SHA-1 hashing will result in the correct SHA-1 hash for messages where no collision attack was detected,
-   but it will result in a different SHA-1 hash for messages where a collision attack was detected.
-   This will automatically invalidate SHA-1 based digital signature forgeries.
-   Enabled by default.
-*/
-void SHA1DCSetSafeHash(SHA1_CTX*, int);
 
 /*
     Function to disable or enable the use of Unavoidable Bitconditions (provides a significant speed up).

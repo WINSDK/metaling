@@ -360,7 +360,6 @@ if (mask) {
 	dvmask[0]=mask;
 }
 
-#ifndef SHA1DC_NO_STANDARD_INCLUDES
 #include <string.h>
 #include <memory.h>
 #include <stdio.h>
@@ -368,14 +367,9 @@ if (mask) {
 #ifdef __unix__
 #include <sys/types.h> /* make sure macros like _BIG_ENDIAN visible */
 #endif
-#endif
 
 #ifdef SHA1DC_CUSTOM_INCLUDE_SHA1_C
 #include SHA1DC_CUSTOM_INCLUDE_SHA1_C
-#endif
-
-#ifndef SHA1DC_INIT_SAFE_HASH_DEFAULT
-#define SHA1DC_INIT_SAFE_HASH_DEFAULT 1
 #endif
 
 #include "sha1.hpp"
@@ -2103,13 +2097,6 @@ static void sha1_process(SHA1_CTX* ctx, const uint32_t block[16])
 						|| (ctx->reduced_round_coll && 0==((ctx->ihv1[0] ^ ctx->ihv2[0]) | (ctx->ihv1[1] ^ ctx->ihv2[1]) | (ctx->ihv1[2] ^ ctx->ihv2[2]) | (ctx->ihv1[3] ^ ctx->ihv2[3]) | (ctx->ihv1[4] ^ ctx->ihv2[4]))))
 					{
 						ctx->found_collision = 1;
-
-						if (ctx->safe_hash)
-						{
-							sha1_compression_W(ctx->ihv, ctx->m1);
-							sha1_compression_W(ctx->ihv, ctx->m1);
-						}
-
 						break;
 					}
 				}
@@ -2127,19 +2114,10 @@ void SHA1DCInit(SHA1_CTX* ctx)
 	ctx->ihv[3] = 0x10325476;
 	ctx->ihv[4] = 0xC3D2E1F0;
 	ctx->found_collision = 0;
-	ctx->safe_hash = SHA1DC_INIT_SAFE_HASH_DEFAULT;
 	ctx->ubc_check = 1;
 	ctx->detect_coll = 1;
 	ctx->reduced_round_coll = 0;
 	ctx->callback = NULL;
-}
-
-void SHA1DCSetSafeHash(SHA1_CTX* ctx, int safehash)
-{
-	if (safehash)
-		ctx->safe_hash = 1;
-	else
-		ctx->safe_hash = 0;
 }
 
 

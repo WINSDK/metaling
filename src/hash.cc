@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string_view>
+
 #include "common.hpp"
 #include "sha1.hpp"
 
@@ -84,47 +85,107 @@ void generate_example(const char* pmk, const u8 mac_ap[6], const u8 mac_sta[6], 
     hash::pmkid(pmk_padded, mac_ap, mac_sta, out_hash);
 }
 
-#define DIGITS "0123456789"
-#define LOWERCASE "abcdefghijklmnopqrstuvwxyz"
-#define UPPERCASE "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-#define ALPHA LOWERCASE UPPERCASE
-#define ANY ALPHA "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+u8 DIGITS[] =
+    "\0"
+    " "
+    "0123456789";
+u8 LOWERCASE[] =
+    "\0"
+    " "
+    "abcdefghijklmnopqrstuvwxyz";
+u8 UPPERCASE[] =
+    "\0"
+    " "
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+u8 ALPHA[] =
+    "\0"
+    " "
+    "abcdefghijklmnopqrstuvwxyz"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+u8 ALPHA_NUM[] =
+    "\0"
+    " "
+    "0123456789"
+    "abcdefghijklmnopqrstuvwxyz"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+u8 ANY[] =
+    "\0"
+    " "
+    "0123456789"
+    "abcdefghijklmnopqrstuvwxyz"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+
+u64 calculate_total_hashes(std::string_view pattern) {
+    u64 combs = 1;
+
+    for (u64 idx = 0; idx < pattern.length(); idx++) {
+        switch (pattern[idx]) {
+            case 'd':
+                combs *= sizeof(DIGITS);
+                break;
+            case 'l':
+                combs *= sizeof(LOWERCASE);
+                break;
+            case 'u':
+                combs *= sizeof(UPPERCASE);
+                break;
+            case 'a':
+                combs *= sizeof(ALPHA);
+                break;
+            case 'n':
+                combs *= sizeof(ALPHA_NUM);
+                break;
+            case '?':
+                combs *= sizeof(ANY);
+                break;
+            default:
+                error("invalid pattern character '%c'\n", pattern[idx]);
+        }
+    }
+
+    return combs;
+}
 
 void generate_permutations(std::string_view pattern, std::function<bool(const u8[64])> callback) {
-    u64 len = pattern.size();
+    u64 len = pattern.length();
     u8 current[64] = {0};
 
     if (len > 64)
-        error("Support for patterns great than 64 characters isn't supported");
+        error("Support for patterns great than 64 characters isn't supported\n");
 
     // Precompute character sets for each position in the pattern.
-    const char* char_sets[len];
+    const u8* char_sets[len];
     u32 set_sizes[len];
 
     for (u64 idx = 0; idx < len; idx++) {
         switch (pattern[idx]) {
             case 'd':
                 char_sets[idx] = DIGITS;
-                set_sizes[idx] = std::strlen(DIGITS);
+                set_sizes[idx] = sizeof(DIGITS);
                 break;
             case 'l':
                 char_sets[idx] = LOWERCASE;
-                set_sizes[idx] = std::strlen(LOWERCASE);
+                set_sizes[idx] = sizeof(LOWERCASE);
                 break;
             case 'u':
                 char_sets[idx] = UPPERCASE;
-                set_sizes[idx] = std::strlen(UPPERCASE);
+                set_sizes[idx] = sizeof(UPPERCASE);
                 break;
             case 'a':
                 char_sets[idx] = ALPHA;
-                set_sizes[idx] = std::strlen(ALPHA);
+                set_sizes[idx] = sizeof(ALPHA);
+                break;
+            case 'n':
+                char_sets[idx] = ALPHA_NUM;
+                set_sizes[idx] = sizeof(ALPHA_NUM);
                 break;
             case '?':
                 char_sets[idx] = ANY;
-                set_sizes[idx] = std::strlen(ANY);
+                set_sizes[idx] = sizeof(ANY);
                 break;
             default:
-                error("invalid pattern character '%c'", pattern[idx]);
+                error("invalid pattern character '%c'\n", pattern[idx]);
         }
     }
 
@@ -139,20 +200,20 @@ void generate_permutations(std::string_view pattern, std::function<bool(const u8
         if (!callback(current))
             return;
 
-        // Increment indices from right to left.
-        i64 pos = len - 1;
-        while (pos >= 0) {
+        // Increment indices from left to right.
+        u64 pos = 0;
+        while (pos < len) {
             if (indices[pos] < set_sizes[pos] - 1) {
                 indices[pos]++;
                 break;
             } else {
                 indices[pos] = 0;
-                pos--;
+                pos++;
             }
         }
 
-        // All permutations generated.
-        if (pos < 0)
+        // All permutations generated
+        if (pos == len)
             break;
     }
 }

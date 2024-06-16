@@ -81,16 +81,16 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 target_compile_options(metaling PRIVATE
-  -fno-exceptions
-  -fno-unwind-tables
-  -fno-asynchronous-unwind-tables
-  -Wall
-  -Wextra
-  -Wno-sign-compare
-  -Wno-unused-function
-  -Wno-unused-parameter
-  -Wno-missing-field-initializers
-  -ggnu-pubnames
+    -fno-exceptions
+    -fno-unwind-tables
+    -fno-asynchronous-unwind-tables
+    -Wall
+    -Wextra
+    -Wno-sign-compare
+    -Wno-unused-function
+    -Wno-unused-parameter
+    -Wno-missing-field-initializers
+    -ggnu-pubnames
 )
 
 target_sources(metaling PRIVATE
