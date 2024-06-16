@@ -20,7 +20,6 @@ def hmac_sha1_128(key, msg):
     outer_pad = bytes(a ^ b for a, b in zip(opad, key))
 
     inner_hash = hashlib.sha1(inner_pad + msg).digest()
-    print(f"inner_hash: {inner_hash.hex()}")
     outer_hash = hashlib.sha1(outer_pad + inner_hash).digest()
 
     return outer_hash
@@ -50,8 +49,6 @@ if __name__ == "__main__":
     mac_sta = mac_to_bytes('66:77:88:99:AA:BB')
 
     target = generate_pmkid(b"lol", mac_ap, mac_sta)
-    print(f"outer_hash: {target.hex()}")
-    exit(0)
 
     for pmk in generate_rand_pmks(4):
         pmkid = generate_pmkid(pmk, mac_ap, mac_sta)

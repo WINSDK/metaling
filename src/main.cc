@@ -91,7 +91,7 @@ int main(int argc, const char* argv[]) {
     hash::pmkid("lol", mac_ap, mac_sta, hash);
 
     std::string out = hash::bytes_to_digest(reinterpret_cast<u8*>(hash), 20);
-    printf("outer_hash: %s\n", out.c_str());
+    printf("%s\n", out.c_str());
 
     return 0;
 }

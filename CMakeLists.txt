@@ -103,5 +103,6 @@ target_sources(metaling PRIVATE
     src/main.cc
     src/metal.cc
     src/hash.cc
+    src/sha1.cc
     src/common.cc
 )

@@ -2,8 +2,8 @@
 #include <sstream>
 #include <string_view>
 #include "common.hpp"
-#include "sha1.hpp"
 #include "hash.hpp"
+#include "sha1.hpp"
 
 namespace hash {
 
@@ -38,22 +38,18 @@ inline void hmac_sha1_128(const u32 key[16], const u32 msg[5], u32 out_hash[5]) 
     u32 opad[21];
     hmac_sha1_128_init(ipad, opad, key);
 
-    sha1::SHA1 sum; // this is slow
+    SHA1_CTX ctx;
+
     u32 inner_hash[5];
-
     memcpy(&ipad[16], msg, 5 * sizeof(u32));
-    sum.feed_bytes(ipad, sizeof(ipad));
-    sum.get_digest(inner_hash);
-
-    {
-        auto as_str = bytes_to_digest(reinterpret_cast<u8*>(inner_hash), 20);
-        printf("inner_hash: %s\n", as_str.c_str());
-    }
+    SHA1DCInit(&ctx);
+    SHA1DCUpdate(&ctx, reinterpret_cast<const char*>(ipad), sizeof(ipad));
+    SHA1DCFinal(reinterpret_cast<unsigned char*>(inner_hash), &ctx);
 
     memcpy(&opad[16], inner_hash, 5 * sizeof(u32));
-    sum.reset();
-    sum.feed_bytes(opad, sizeof(opad));
-    sum.get_digest(out_hash);
+    SHA1DCInit(&ctx);
+    SHA1DCUpdate(&ctx, reinterpret_cast<const char*>(opad), sizeof(opad));
+    SHA1DCFinal(reinterpret_cast<unsigned char*>(out_hash), &ctx);
 }
 
 void pmkid(const char* pmk, const u8 mac_ap[6], const u8 mac_sta[6], u32 out_hash[5]) {

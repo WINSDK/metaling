@@ -1,199 +1,99 @@
-/*
- *
- * TinySHA1 - a header only implementation of the SHA1 algorithm in C++. Based
- * on the implementation in boost::uuid::details.
- *
- * SHA1 Wikipedia Page: http://en.wikipedia.org/wiki/SHA-1
- *
- * Copyright (c) 2012-22 SAURAV MOHAPATRA <mohaps@gmail.com>
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-#ifndef _TINY_SHA1_HPP_
-#define _TINY_SHA1_HPP_
+/***
+* Copyright 2017 Marc Stevens <marc@marc-stevens.nl>, Dan Shumow <danshu@microsoft.com>
+* Distributed under the MIT Software License.
+* See accompanying file LICENSE.txt or copy at
+* https://opensource.org/licenses/MIT
+***/
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include <stdint.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-namespace sha1 {
-class SHA1 {
-   public:
-    typedef uint32_t digest32_t[5];
-    typedef uint8_t digest8_t[20];
-    inline static uint32_t left_rot(uint32_t value, size_t count) {
-        return (value << count) ^ (value >> (32 - count));
-    }
-    SHA1() {
-        reset();
-    }
-    virtual ~SHA1() {}
-    SHA1(const SHA1& s) {
-        *this = s;
-    }
-    const SHA1& operator=(const SHA1& s) {
-        memcpy(m_digest, s.m_digest, 5 * sizeof(uint32_t));
-        memcpy(m_block, s.m_block, 64);
-        m_block_byte_idx = s.m_block_byte_idx;
-        m_byte_count = s.m_byte_count;
-        return *this;
-    }
-    SHA1& reset() {
-        m_digest[0] = 0x67452301;
-        m_digest[1] = 0xEFCDAB89;
-        m_digest[2] = 0x98BADCFE;
-        m_digest[3] = 0x10325476;
-        m_digest[4] = 0xC3D2E1F0;
-        m_block_byte_idx = 0;
-        m_byte_count = 0;
-        return *this;
-    }
-    SHA1& process_byte(uint8_t octet) {
-        this->m_block[this->m_block_byte_idx++] = octet;
-        ++this->m_byte_count;
-        if (m_block_byte_idx == 64) {
-            this->m_block_byte_idx = 0;
-            process_block();
-        }
-        return *this;
-    }
-    SHA1& process_blocks(const void* const start, const void* const end) {
-        const uint8_t* begin = static_cast<const uint8_t*>(start);
-        const uint8_t* finish = static_cast<const uint8_t*>(end);
-        while (begin != finish) {
-            process_byte(*begin);
-            begin++;
-        }
-        return *this;
-    }
-    SHA1& feed_bytes(const void* const data, size_t len) {
-        const uint8_t* block = static_cast<const uint8_t*>(data);
-        process_blocks(block, block + len);
-        return *this;
-    }
-    const uint32_t* get_digest(digest32_t digest) {
-        size_t bit_count = this->m_byte_count * 8;
-        process_byte(0x80);
-        if (this->m_block_byte_idx > 56) {
-            while (m_block_byte_idx != 0) {
-                process_byte(0);
-            }
-            while (m_block_byte_idx < 56) {
-                process_byte(0);
-            }
-        } else {
-            while (m_block_byte_idx < 56) {
-                process_byte(0);
-            }
-        }
-        process_byte(0);
-        process_byte(0);
-        process_byte(0);
-        process_byte(0);
-        process_byte(static_cast<unsigned char>((bit_count >> 24) & 0xFF));
-        process_byte(static_cast<unsigned char>((bit_count >> 16) & 0xFF));
-        process_byte(static_cast<unsigned char>((bit_count >> 8) & 0xFF));
-        process_byte(static_cast<unsigned char>((bit_count) & 0xFF));
 
-        memcpy(digest, m_digest, 5 * sizeof(uint32_t));
-        return digest;
-    }
-    const uint8_t* get_digest_bytes(digest8_t digest) {
-        digest32_t d32;
-        get_digest(d32);
-        size_t di = 0;
-        digest[di++] = ((d32[0] >> 24) & 0xFF);
-        digest[di++] = ((d32[0] >> 16) & 0xFF);
-        digest[di++] = ((d32[0] >> 8) & 0xFF);
-        digest[di++] = ((d32[0]) & 0xFF);
+/* sha-1 compression function that takes an already expanded message, and additionally store intermediate states */
+/* only stores states ii (the state between step ii-1 and step ii) when DOSTORESTATEii is defined in ubc_check.h */
+void sha1_compression_states(uint32_t[5], const uint32_t[16], uint32_t[80], uint32_t[80][5]);
 
-        digest[di++] = ((d32[1] >> 24) & 0xFF);
-        digest[di++] = ((d32[1] >> 16) & 0xFF);
-        digest[di++] = ((d32[1] >> 8) & 0xFF);
-        digest[di++] = ((d32[1]) & 0xFF);
+/*
+// Function type for sha1_recompression_step_T (uint32_t ihvin[5], uint32_t ihvout[5], const uint32_t me2[80], const uint32_t state[5]).
+// Where 0 <= T < 80
+//       me2 is an expanded message (the expansion of an original message block XOR'ed with a disturbance vector's message block difference.)
+//       state is the internal state (a,b,c,d,e) before step T of the SHA-1 compression function while processing the original message block.
+// The function will return:
+//       ihvin: The reconstructed input chaining value.
+//       ihvout: The reconstructed output chaining value.
+*/
+typedef void(*sha1_recompression_type)(uint32_t*, uint32_t*, const uint32_t*, const uint32_t*);
 
-        digest[di++] = ((d32[2] >> 24) & 0xFF);
-        digest[di++] = ((d32[2] >> 16) & 0xFF);
-        digest[di++] = ((d32[2] >> 8) & 0xFF);
-        digest[di++] = ((d32[2]) & 0xFF);
+/* A callback function type that can be set to be called when a collision block has been found: */
+/* void collision_block_callback(uint64_t byteoffset, const uint32_t ihvin1[5], const uint32_t ihvin2[5], const uint32_t m1[80], const uint32_t m2[80]) */
+typedef void(*collision_block_callback)(uint64_t, const uint32_t*, const uint32_t*, const uint32_t*, const uint32_t*);
 
-        digest[di++] = ((d32[3] >> 24) & 0xFF);
-        digest[di++] = ((d32[3] >> 16) & 0xFF);
-        digest[di++] = ((d32[3] >> 8) & 0xFF);
-        digest[di++] = ((d32[3]) & 0xFF);
+/* The SHA-1 context. */
+typedef struct {
+	uint64_t total;
+	uint32_t ihv[5];
+	unsigned char buffer[64];
+	int found_collision;
+	int safe_hash;
+	int detect_coll;
+	int ubc_check;
+	int reduced_round_coll;
+	collision_block_callback callback;
 
-        digest[di++] = ((d32[4] >> 24) & 0xFF);
-        digest[di++] = ((d32[4] >> 16) & 0xFF);
-        digest[di++] = ((d32[4] >> 8) & 0xFF);
-        digest[di++] = ((d32[4]) & 0xFF);
-        return digest;
-    }
+	uint32_t ihv1[5];
+	uint32_t ihv2[5];
+	uint32_t m1[80];
+	uint32_t m2[80];
+	uint32_t states[80][5];
+} SHA1_CTX;
 
-   protected:
-    void process_block() {
-        uint32_t w[80];
-        for (size_t i = 0; i < 16; i++) {
-            w[i] = (m_block[i * 4 + 0] << 24);
-            w[i] |= (m_block[i * 4 + 1] << 16);
-            w[i] |= (m_block[i * 4 + 2] << 8);
-            w[i] |= (m_block[i * 4 + 3]);
-        }
-        for (size_t i = 16; i < 80; i++) {
-            w[i] = left_rot((w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16]), 1);
-        }
+/* Initialize SHA-1 context. */
+void SHA1DCInit(SHA1_CTX*);
 
-        uint32_t a = m_digest[0];
-        uint32_t b = m_digest[1];
-        uint32_t c = m_digest[2];
-        uint32_t d = m_digest[3];
-        uint32_t e = m_digest[4];
+/*
+    Function to enable safe SHA-1 hashing:
+    Collision attacks are thwarted by hashing a detected near-collision block 3 times.
+    Think of it as extending SHA-1 from 80-steps to 240-steps for such blocks:
+        The best collision attacks against SHA-1 have complexity about 2^60,
+        thus for 240-steps an immediate lower-bound for the best cryptanalytic attacks would be 2^180.
+        An attacker would be better off using a generic birthday search of complexity 2^80.
 
-        for (std::size_t i = 0; i < 80; ++i) {
-            uint32_t f = 0;
-            uint32_t k = 0;
+   Enabling safe SHA-1 hashing will result in the correct SHA-1 hash for messages where no collision attack was detected,
+   but it will result in a different SHA-1 hash for messages where a collision attack was detected.
+   This will automatically invalidate SHA-1 based digital signature forgeries.
+   Enabled by default.
+*/
+void SHA1DCSetSafeHash(SHA1_CTX*, int);
 
-            if (i < 20) {
-                f = (b & c) | (~b & d);
-                k = 0x5A827999;
-            } else if (i < 40) {
-                f = b ^ c ^ d;
-                k = 0x6ED9EBA1;
-            } else if (i < 60) {
-                f = (b & c) | (b & d) | (c & d);
-                k = 0x8F1BBCDC;
-            } else {
-                f = b ^ c ^ d;
-                k = 0xCA62C1D6;
-            }
-            uint32_t temp = left_rot(a, 5) + f + e + k + w[i];
-            e = d;
-            d = c;
-            c = left_rot(b, 30);
-            b = a;
-            a = temp;
-        }
+/*
+    Function to disable or enable the use of Unavoidable Bitconditions (provides a significant speed up).
+    Enabled by default
+ */
+void SHA1DCSetUseUBC(SHA1_CTX*, int);
 
-        m_digest[0] += a;
-        m_digest[1] += b;
-        m_digest[2] += c;
-        m_digest[3] += d;
-        m_digest[4] += e;
-    }
+/*
+    Function to disable or enable the use of Collision Detection.
+    Enabled by default.
+ */
+void SHA1DCSetUseDetectColl(SHA1_CTX*, int);
 
-   private:
-    digest32_t m_digest;
-    uint8_t m_block[64];
-    size_t m_block_byte_idx;
-    size_t m_byte_count;
-};
-} // namespace sha1
+/* function to disable or enable the detection of reduced-round SHA-1 collisions */
+/* disabled by default */
+void SHA1DCSetDetectReducedRoundCollision(SHA1_CTX*, int);
+
+/* function to set a callback function, pass NULL to disable */
+/* by default no callback set */
+void SHA1DCSetCallback(SHA1_CTX*, collision_block_callback);
+
+/* update SHA-1 context with buffer contents */
+void SHA1DCUpdate(SHA1_CTX*, const char*, size_t);
+
+/* obtain SHA-1 hash from SHA-1 context */
+/* returns: 0 = no collision detected, otherwise = collision found => warn user for active attack */
+int  SHA1DCFinal(unsigned char[20], SHA1_CTX*);
+
+#if defined(__cplusplus)
+}
 #endif
