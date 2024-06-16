@@ -1,25 +1,15 @@
+#include "hash.hpp"
+#include <functional>
 #include <iomanip>
 #include <sstream>
 #include <string_view>
 #include "common.hpp"
-#include "hash.hpp"
 #include "sha1.hpp"
 
 namespace hash {
 
-// Assumes `out_padded` is already zero-initialized, shouldn't be used outside of testing.
-void pad_key(const char* key, u32 out_padded[16]) {
-    u64 len = std::strlen(key);
-
-    if (len > 64)
-        error("shouldn't pass pmkid(..) pmk's that are larger than 64 characters");
-
-    u8 *out_bytes_padded = reinterpret_cast<u8*>(out_padded);
-
-    // Fill the array with the message data.
-    for (u64 idx = 0; idx < len; idx++)
-        out_bytes_padded[idx] = key[idx];
-}
+// Assumption we make when casting strings.
+static_assert(sizeof(char) == sizeof(u8));
 
 void hmac_sha1_128_init(u32 ipad[16], u32 opad[16], const u32 key[16]) {
     for (u32 idx = 0; idx < 16; idx++) {
@@ -33,12 +23,12 @@ void hmac_sha1_128_init(u32 ipad[16], u32 opad[16], const u32 key[16]) {
     }
 }
 
+thread_local SHA1_CTX ctx;
+
 inline void hmac_sha1_128(const u32 key[16], const u32 msg[5], u32 out_hash[5]) {
     u32 ipad[21];
     u32 opad[21];
     hmac_sha1_128_init(ipad, opad, key);
-
-    SHA1_CTX ctx;
 
     u32 inner_hash[5];
     memcpy(&ipad[16], msg, 5 * sizeof(u32));
@@ -52,7 +42,8 @@ inline void hmac_sha1_128(const u32 key[16], const u32 msg[5], u32 out_hash[5]) 
     SHA1DCFinal(reinterpret_cast<unsigned char*>(out_hash), &ctx);
 }
 
-void pmkid(const char* pmk, const u8 mac_ap[6], const u8 mac_sta[6], u32 out_hash[5]) {
+// Must have `pmk` zero initialized for any unused bytes.
+void pmkid(const u8 pmk[64], const u8 mac_ap[6], const u8 mac_sta[6], u32 out_hash[5]) {
     u8 msg[20]; // = "PMK Name" + mac_ap + mac_sta
 
     memcpy(msg, "PMK Name", 8);
@@ -63,10 +54,7 @@ void pmkid(const char* pmk, const u8 mac_ap[6], const u8 mac_sta[6], u32 out_has
     for (u64 idx = 0; idx < 6; idx++)
         msg[idx + 14] = mac_sta[idx];
 
-    u32 padded_key[16] = {0};
-    pad_key(pmk, padded_key);
-
-    hmac_sha1_128(padded_key, reinterpret_cast<u32*>(msg), out_hash);
+    hmac_sha1_128(reinterpret_cast<const u32*>(pmk), reinterpret_cast<u32*>(msg), out_hash);
 }
 
 void mac_to_bytes(std::string_view mac, u8 out_mac[6]) {
@@ -89,4 +77,84 @@ std::string bytes_to_digest(const u8* bytes, u64 len) {
     return oss.str();
 }
 
+void generate_example(const char* pmk, const u8 mac_ap[6], const u8 mac_sta[6], u32 out_hash[5]) {
+    u8 pmk_padded[64] = {0};
+    u64 pmk_len = std::strlen(pmk);
+    std::strncpy(reinterpret_cast<char*>(pmk_padded), pmk, pmk_len);
+    hash::pmkid(pmk_padded, mac_ap, mac_sta, out_hash);
 }
+
+#define DIGITS "0123456789"
+#define LOWERCASE "abcdefghijklmnopqrstuvwxyz"
+#define UPPERCASE "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define ALPHA LOWERCASE UPPERCASE
+#define ANY ALPHA "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+
+void generate_permutations(std::string_view pattern, std::function<bool(const u8[64])> callback) {
+    u64 len = pattern.size();
+    u8 current[64] = {0};
+
+    if (len > 64)
+        error("Support for patterns great than 64 characters isn't supported");
+
+    // Precompute character sets for each position in the pattern.
+    const char* char_sets[len];
+    u32 set_sizes[len];
+
+    for (u64 idx = 0; idx < len; idx++) {
+        switch (pattern[idx]) {
+            case 'd':
+                char_sets[idx] = DIGITS;
+                set_sizes[idx] = std::strlen(DIGITS);
+                break;
+            case 'l':
+                char_sets[idx] = LOWERCASE;
+                set_sizes[idx] = std::strlen(LOWERCASE);
+                break;
+            case 'u':
+                char_sets[idx] = UPPERCASE;
+                set_sizes[idx] = std::strlen(UPPERCASE);
+                break;
+            case 'a':
+                char_sets[idx] = ALPHA;
+                set_sizes[idx] = std::strlen(ALPHA);
+                break;
+            case '?':
+                char_sets[idx] = ANY;
+                set_sizes[idx] = std::strlen(ANY);
+                break;
+            default:
+                error("invalid pattern character '%c'", pattern[idx]);
+        }
+    }
+
+    u32 indices[len];
+    memset(indices, 0, sizeof(u32) * len);
+
+    while (true) {
+        // Construct the current permutation based on indices.
+        for (u64 idx = 0; idx < len; idx++)
+            current[idx] = char_sets[idx][indices[idx]];
+
+        if (!callback(current))
+            return;
+
+        // Increment indices from right to left.
+        i64 pos = len - 1;
+        while (pos >= 0) {
+            if (indices[pos] < set_sizes[pos] - 1) {
+                indices[pos]++;
+                break;
+            } else {
+                indices[pos] = 0;
+                pos--;
+            }
+        }
+
+        // All permutations generated.
+        if (pos < 0)
+            break;
+    }
+}
+
+} // namespace hash

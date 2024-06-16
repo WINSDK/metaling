@@ -68,12 +68,6 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
     target_compile_options(metaling PRIVATE -fpch-preprocess)
 endif()
 
-# Try to use mold linker.
-find_program(MOLD_EXISTS "mold")
-if(MOLD_EXISTS)
-    target_link_options(metaling PRIVATE -fuse-ld=mold)
-endif()
-
 # Turn on -flto.
 # set_property(TARGET metaling PROPERTY INTERPROCEDURAL_OPTIMIZATION ON)
 

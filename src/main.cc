@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cstring>
 #include <string>
 #include "common.hpp"
 #include "metal.hpp"
@@ -81,17 +82,43 @@ int main(int argc, const char* argv[]) {
     // example_mul_buffered(&kern);
     // example_mul(&kern);
 
+    if (argc < 2)
+        error("failed to provide pattern, usage: ./metaling {d|l|u|a|?}*\n");
+
+    const char *pattern = argv[1];
+
+    // example hash
     u8 mac_ap[6];
     hash::mac_to_bytes("00:11:22:33:44:55", mac_ap);
 
     u8 mac_sta[6];
     hash::mac_to_bytes("66:77:88:99:AA:BB", mac_sta);
 
-    u32 hash[5];
-    hash::pmkid("lol", mac_ap, mac_sta, hash);
+    u32 target_hash[5];
+    hash::generate_example("lol", mac_ap, mac_sta, target_hash);
+    // end of example hash
 
-    std::string out = hash::bytes_to_digest(reinterpret_cast<u8*>(hash), 20);
-    printf("%s\n", out.c_str());
+    u32 hash[5];
+    bool found_match = false;
+    hash::generate_permutations(pattern, [&](const u8 test_case[64]) {
+        hash::pmkid(test_case, mac_ap, mac_sta, hash);
+
+        for (u64 idx = 0; idx < 5; idx++)
+            if (hash[idx] != target_hash[idx])
+                // keep looking for matching hashes
+                return true;
+
+        found_match = true;
+        return false;
+    });
+
+    if (found_match) {
+        std::string out = hash::bytes_to_digest(reinterpret_cast<u8*>(hash), 20);
+        printf("found matching hash: %s\n", out.c_str());
+    } else {
+        printf("failed to find match hash with given pattern\n");
+    }
+
 
     return 0;
 }
