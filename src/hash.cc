@@ -147,6 +147,16 @@ u64 calculate_total_hashes(std::string_view pattern) {
     return perms;
 }
 
+
+// Function to initialize indices based on a given index.
+inline void initialize_indices(u64 current_idx, u32 indices[], const u32 set_sizes[], u64 len) {
+    for (u64 idx = 0; idx < len; idx++) {
+        u32 set_size = set_sizes[idx];
+        indices[idx] = current_idx % set_size;
+        current_idx /= set_size;
+    }
+}
+
 void generate_permutations(
     std::string_view pattern,
     u64 chunk_idx,
@@ -205,18 +215,13 @@ void generate_permutations(
         perms *= set_sizes[idx];
 
     // Calculate the range of permutations this chunk will handle.
-    u64 chunk_size = (perms + chunk_count - 1) / chunk_count; // Ceiling division.
-    u64 start_idx = chunk_idx * chunk_size;
-    u64 end_idx = std::min(start_idx + chunk_size, perms);
+    u64 stride = 1024 * 64;
+    u64 start_idx = chunk_idx * stride;
+    u64 end_idx = perms;
 
     // Initialize indices to start at start_index.
     u32 indices[len];
-    u32 current_idx = start_idx;
-    for (u64 idx = 0; idx < len; ++idx) {
-        u32 set_size = set_sizes[idx];
-        indices[idx] = current_idx % set_size;
-        current_idx /= set_size;
-    }
+    initialize_indices(start_idx, indices, set_sizes, len);
 
     while (start_idx < end_idx) {
         // Construct the current permutation based on indices.
@@ -243,6 +248,12 @@ void generate_permutations(
             break;
 
         start_idx++;
+
+        // If we've completed a stride, move to the next chunk's corresponding stride.
+        if (start_idx % stride == 0) {
+            start_idx += (chunk_count - 1) * stride;
+            initialize_indices(start_idx, indices, set_sizes, len);
+        }
     }
 }
 
