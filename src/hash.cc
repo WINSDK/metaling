@@ -117,42 +117,52 @@ u8 ANY[] =
     "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 u64 calculate_total_hashes(std::string_view pattern) {
-    u64 combs = 1;
+    u64 perms = 1;
 
     for (u64 idx = 0; idx < pattern.length(); idx++) {
         switch (pattern[idx]) {
             case 'd':
-                combs *= sizeof(DIGITS);
+                perms *= sizeof(DIGITS);
                 break;
             case 'l':
-                combs *= sizeof(LOWERCASE);
+                perms *= sizeof(LOWERCASE);
                 break;
             case 'u':
-                combs *= sizeof(UPPERCASE);
+                perms *= sizeof(UPPERCASE);
                 break;
             case 'a':
-                combs *= sizeof(ALPHA);
+                perms *= sizeof(ALPHA);
                 break;
             case 'n':
-                combs *= sizeof(ALPHA_NUM);
+                perms *= sizeof(ALPHA_NUM);
                 break;
             case '?':
-                combs *= sizeof(ANY);
+                perms *= sizeof(ANY);
                 break;
             default:
                 error("invalid pattern character '%c'\n", pattern[idx]);
         }
     }
 
-    return combs;
+    return perms;
 }
 
-void generate_permutations(std::string_view pattern, std::function<bool(const u8[64])> callback) {
+void generate_permutations(
+    std::string_view pattern,
+    u64 chunk_idx,
+    u64 chunk_count,
+    std::function<bool(const u8[64])> callback) {
     u64 len = pattern.length();
     u8 current[64] = {0};
 
+    if (chunk_idx >= chunk_count)
+        error("idx %lld, is out of range of chunk count %lld\n", chunk_idx, chunk_count);
+
+    if (chunk_count == 0)
+        error("chunk count of 0 is not supported.\n");
+
     if (len > 64)
-        error("Support for patterns great than 64 characters isn't supported\n");
+        error("support for patterns great than 64 characters isn't supported\n");
 
     // Precompute character sets for each position in the pattern.
     const u8* char_sets[len];
@@ -189,10 +199,26 @@ void generate_permutations(std::string_view pattern, std::function<bool(const u8
         }
     }
 
-    u32 indices[len];
-    memset(indices, 0, sizeof(u32) * len);
+    // Calculate the total number of permutations.
+    u64 perms = 1;
+    for (u64 idx = 0; idx < len; ++idx)
+        perms *= set_sizes[idx];
 
-    while (true) {
+    // Calculate the range of permutations this chunk will handle.
+    u64 chunk_size = (perms + chunk_count - 1) / chunk_count; // Ceiling division.
+    u64 start_idx = chunk_idx * chunk_size;
+    u64 end_idx = std::min(start_idx + chunk_size, perms);
+
+    // Initialize indices to start at start_index.
+    u32 indices[len];
+    u32 current_idx = start_idx;
+    for (u64 idx = 0; idx < len; ++idx) {
+        u32 set_size = set_sizes[idx];
+        indices[idx] = current_idx % set_size;
+        current_idx /= set_size;
+    }
+
+    while (start_idx < end_idx) {
         // Construct the current permutation based on indices.
         for (u64 idx = 0; idx < len; idx++)
             current[idx] = char_sets[idx][indices[idx]];
@@ -215,6 +241,8 @@ void generate_permutations(std::string_view pattern, std::function<bool(const u8
         // All permutations generated
         if (pos == len)
             break;
+
+        start_idx++;
     }
 }
 

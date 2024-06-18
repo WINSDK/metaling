@@ -2,6 +2,8 @@
 #include <cstring>
 #include <string>
 #include <chrono>
+#include <thread>
+#include <atomic>
 
 #include "common.hpp"
 #include "metal.hpp"
@@ -88,6 +90,63 @@ void print_progress(double rate, double percentage) {
     fflush(stdout);
 }
 
+struct GlobalContext {
+    std::atomic<bool> found_match;
+    std::atomic<u64> total_hash_count;
+};
+
+struct ThreadContext {
+    u8 *mac_ap;
+    u8 *mac_sta;
+    u32 *target_hash;
+    std::string_view pattern;
+
+    u64 idx;
+    u64 thread_count;
+    u64 hashes_to_check;
+    std::thread thread;
+};
+
+void worker(GlobalContext *gctx, ThreadContext *tctx) {
+    u32 hash[5];
+    u64 hash_count = 0;
+    auto start = high_resolution_clock::now();
+
+    hash::generate_permutations(tctx->pattern, tctx->idx, tctx->thread_count, [&](const u8 test_case[64]) {
+        hash::pmkid(test_case, tctx->mac_ap, tctx->mac_sta, hash);
+        hash_count++;
+
+        if (hash_count == 500000) {
+            // Early return if match is found by different thread.
+            if (gctx->found_match.load())
+                return false;
+
+            u64 total_hash_count = gctx->total_hash_count.load(std::memory_order_acquire);
+            gctx->total_hash_count.store(total_hash_count + hash_count, std::memory_order_release);
+
+            auto now = high_resolution_clock::now();
+            auto duration = duration_cast<milliseconds>(now - start);
+            double hps = ((double)hash_count / (double)duration.count()) * 1000;
+            double progress = (double)total_hash_count / (double)tctx->hashes_to_check;
+            print_progress(hps / 1024.0, progress);
+
+            start = now;
+            hash_count = 0;
+        }
+
+        for (u64 jdx = 0; jdx < 5; jdx++)
+            if (hash[jdx] != tctx->target_hash[jdx])
+                // Keep looking for matching hashes.
+                return true;
+
+        std::string out = hash::bytes_to_digest(reinterpret_cast<u8*>(hash), 20);
+        printf("\nfound matching hash: %s\n", out.c_str());
+        printf("passphrase is: %s\n", test_case);
+        gctx->found_match.store(true);
+        return false;
+    });
+}
+
 int main(int argc, const char* argv[]) {
     auto kern_path = std::string(ROOT_DIR) + "/src/math.metal";
     ComputeKernel kern = ComputeKernel(kern_path);
@@ -110,56 +169,42 @@ int main(int argc, const char* argv[]) {
     hash::mac_to_bytes("66:77:88:99:AA:BB", mac_sta);
 
     u32 target_hash[5];
-    hash::generate_example("a very", mac_ap, mac_sta, target_hash);
+    hash::generate_example("lola", mac_ap, mac_sta, target_hash);
     // End of example hash.
 
     u64 hashes_to_check = hash::calculate_total_hashes(pattern);
+    printf("hashes to check: %lld\n", hashes_to_check);
 
-    u32 hash[5];
-    bool found_match = false;
-    u64 hash_count = 0;
-    u64 total_hash_count = 0;
-    auto start = high_resolution_clock::now();
+    u64 thread_count = std::thread::hardware_concurrency();
+    printf("detected %lld threads\n", thread_count);
 
-    hash::generate_permutations(pattern, [&](const u8 test_case[64]) {
-        hash::pmkid(test_case, mac_ap, mac_sta, hash);
-        hash_count++;
+    ThreadContext threads[thread_count];
+    GlobalContext gctx = GlobalContext {
+        .found_match = false,
+        .total_hash_count = 0,
+    };
 
-        if ((hash_count & 0xfffff) == 0) {
-            total_hash_count += hash_count;
+    for (u64 idx = 0; idx < thread_count; idx++) {
+        ThreadContext* tctx = &threads[idx];
 
-            auto now = high_resolution_clock::now();
-            auto duration = duration_cast<milliseconds>(now - start);
-            double hps = ((double)hash_count / (double)duration.count()) * 1000;
-            double progress = (double)total_hash_count / (double)hashes_to_check;
-            print_progress(hps / 1024.0, progress);
+        tctx->mac_ap = mac_ap;
+        tctx->mac_sta = mac_sta;
+        tctx->target_hash = target_hash;
+        tctx->pattern = pattern;
 
-            start = now;
-            hash_count = 0;
-        }
+        tctx->idx = idx;
+        tctx->thread_count = thread_count;
+        tctx->hashes_to_check = hashes_to_check;
+        tctx->thread = std::thread(worker, &gctx, tctx);
+    }
 
-        for (u64 idx = 0; idx < 5; idx++)
-            if (hash[idx] != target_hash[idx])
-                // Keep looking for matching hashes.
-                return true;
-
-        printf("passphrase is: %s\n", test_case);
-        found_match = true;
-        return false;
-    });
+    for (u64 idx = 0; idx < thread_count; idx++)
+        threads[idx].thread.join();
 
     // We showed the progress bar, so print a newline.
-    if (total_hash_count >= 0xfffff) {
+    if (gctx.total_hash_count.load() >= 0xfffff) {
         printf("\n");
     }
-
-    if (found_match) {
-        std::string out = hash::bytes_to_digest(reinterpret_cast<u8*>(hash), 20);
-        printf("found matching hash: %s\n", out.c_str());
-    } else {
-        printf("no match found\n");
-    }
-
 
     return 0;
 }
