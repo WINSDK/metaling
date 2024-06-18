@@ -107,6 +107,8 @@ struct ThreadContext {
     std::thread thread;
 };
 
+const u64 PRINT_INTERVAL = 500000;
+
 void worker(GlobalContext *gctx, ThreadContext *tctx) {
     u32 hash[5];
     u64 hash_count = 0;
@@ -116,7 +118,7 @@ void worker(GlobalContext *gctx, ThreadContext *tctx) {
         hash::pmkid(test_case, tctx->mac_ap, tctx->mac_sta, hash);
         hash_count++;
 
-        if (hash_count == 500000) {
+        if (hash_count == PRINT_INTERVAL) {
             // Early return if match is found by different thread.
             if (gctx->found_match.load())
                 return false;
@@ -169,7 +171,7 @@ int main(int argc, const char* argv[]) {
     hash::mac_to_bytes("66:77:88:99:AA:BB", mac_sta);
 
     u32 target_hash[5];
-    hash::generate_example("lola", mac_ap, mac_sta, target_hash);
+    hash::generate_example("lola1", mac_ap, mac_sta, target_hash);
     // End of example hash.
 
     u64 hashes_to_check = hash::calculate_total_hashes(pattern);
@@ -202,9 +204,8 @@ int main(int argc, const char* argv[]) {
         threads[idx].thread.join();
 
     // We showed the progress bar, so print a newline.
-    if (gctx.total_hash_count.load() >= 0xfffff) {
+    if (gctx.total_hash_count.load() >= PRINT_INTERVAL)
         printf("\n");
-    }
 
     return 0;
 }
