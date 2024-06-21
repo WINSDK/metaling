@@ -91,10 +91,12 @@ void print_progress(double rate, double percentage) {
 }
 
 struct GlobalContext {
-    u8* mac_ap;
-    u8* mac_sta;
-    u32* target_hash;
-    std::string_view pattern;
+    u8 mac_ap[6];
+    u8 mac_sta[6];
+    u32 target_hash[5];
+
+    u8 pattern[64];
+    u64 pattern_len;
 
     u64 thread_count;
     u64 hashes_to_check;
@@ -119,7 +121,7 @@ void worker(GlobalContext* gctx, ThreadContext* tctx) {
     if (tctx->idx == 0)
          start = high_resolution_clock::now();
 
-    hash::generate_permutations(gctx->pattern, tctx->idx, gctx->thread_count, [&](const u8 tc[64]) {
+    hash::generate_permutations(gctx->pattern, gctx->pattern_len, tctx->idx, gctx->thread_count, [&](const u8 tc[64]) {
         hash::pmkid(tc, gctx->mac_ap, gctx->mac_sta, hash);
         hash_count++;
 
@@ -161,29 +163,24 @@ void worker(GlobalContext* gctx, ThreadContext* tctx) {
 }
 
 int main(int argc, const char* argv[]) {
-    auto kern_path = std::string(ROOT_DIR) + "/src/math.metal";
-    ComputeKernel kern = ComputeKernel(kern_path);
+    // std::string kern_path = std::string(ROOT_DIR) + "/src/hash.metal";
+    // ComputeKernel kern = ComputeKernel(kern_path);
 
+    // std::string test_path = std::string(ROOT_DIR) + "/src/hash.metal";
+    // ComputeKernel test_kernel = ComputeKernel(kern_path2);
     // printf("tests:\n");
-    // example_add(&kern);
-    // example_mul_buffered(&kern);
-    // example_mul(&kern);
+    // example_add(&test_kern);
+    // example_mul_buffered(&test_kern);
+    // example_mul(&test_kern);
 
     if (argc < 2)
         error("failed to provide pattern, usage: ./metaling {d|l|u|a|?}*\n");
 
     const char* pattern = argv[1];
+    u64 pattern_len = std::strlen(pattern);
 
-    // Example packet.
-    u8 mac_ap[6];
-    hash::mac_to_bytes("00:11:22:33:44:55", mac_ap);
-
-    u8 mac_sta[6];
-    hash::mac_to_bytes("66:77:88:99:AA:BB", mac_sta);
-
-    u32 target_hash[5];
-    hash::generate_example("lola1", mac_ap, mac_sta, target_hash);
-    // End of example hash.
+    if (pattern_len > 63)
+        error("input patterns must be less than 63 characters");
 
     u64 hashes_to_check = hash::calculate_total_hashes(pattern);
     printf("hashes to check: %lld\n", hashes_to_check);
@@ -191,12 +188,9 @@ int main(int argc, const char* argv[]) {
     u64 thread_count = std::thread::hardware_concurrency();
     printf("detected %lld threads\n", thread_count);
 
-    ThreadContext threads[thread_count];
     GlobalContext gctx = GlobalContext{
-        .mac_ap = mac_ap,
-        .mac_sta = mac_sta,
-        .target_hash = target_hash,
-        .pattern = pattern,
+        .pattern = {0},
+        .pattern_len = pattern_len,
 
         .thread_count = thread_count,
         .hashes_to_check = hashes_to_check,
@@ -204,6 +198,16 @@ int main(int argc, const char* argv[]) {
         .found_match = false,
         .total_hash_count = 0,
     };
+
+    // Copy over pattern, the rest of the characters are '\0's.
+    std::strcpy((char*)gctx.pattern, argv[1]);
+
+    // Example packet.
+    hash::mac_to_bytes("00:11:22:33:44:55", gctx.mac_ap);
+    hash::mac_to_bytes("66:77:88:99:AA:BB", gctx.mac_sta);
+    hash::generate_example("lola1", gctx.mac_ap, gctx.mac_sta, gctx.target_hash);
+
+    ThreadContext threads[thread_count];
 
     for (u64 idx = 0; idx < thread_count; idx++) {
         ThreadContext* tctx = &threads[idx];

@@ -157,12 +157,14 @@ inline void initialize_indices(u64 current_idx, u32 indices[], const u32 set_siz
     }
 }
 
+#define MAX_LEN 64
+
 void generate_permutations(
-    std::string_view pattern,
+    const u8 pattern[64],
+    u64 len,
     u64 chunk_idx,
     u64 chunk_count,
     std::function<bool(const u8[64])> callback) {
-    u64 len = pattern.length();
     u8 current[64] = {0};
 
     if (chunk_idx >= chunk_count)
@@ -171,12 +173,9 @@ void generate_permutations(
     if (chunk_count == 0)
         error("chunk count of 0 is not supported.\n");
 
-    if (len > 64)
-        error("support for patterns great than 64 characters isn't supported\n");
-
     // Precompute character sets for each position in the pattern.
-    const u8* char_sets[len];
-    u32 set_sizes[len];
+    const u8* char_sets[MAX_LEN];
+    u32 set_sizes[MAX_LEN];
 
     for (u64 idx = 0; idx < len; idx++) {
         switch (pattern[idx]) {
@@ -220,7 +219,7 @@ void generate_permutations(
     u64 end_idx = perms;
 
     // Initialize indices to start at start_index.
-    u32 indices[len];
+    u32 indices[MAX_LEN];
     initialize_indices(start_idx, indices, set_sizes, len);
 
     while (start_idx < end_idx) {

@@ -20,7 +20,7 @@
     va_start(arglist, fmt);
     fprintf(stderr, "\033[1;31m" "error: " "\033[0m");
     vfprintf(stderr, fmt, arglist);
-    fprintf(stderr, ": %s", err->localizedDescription()->utf8String());
+    fprintf(stderr, ":\n%s", err->localizedDescription()->utf8String());
     va_end(arglist);
 
     _exit(1);

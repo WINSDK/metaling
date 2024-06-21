@@ -12,7 +12,8 @@ u64 calculate_total_hashes(std::string_view pattern);
 
 void generate_example(const char* pmk, const u8 mac_ap[6], const u8 mac_sta[6], u32 out_hash[5]);
 void generate_permutations(
-    std::string_view pattern,
+    const u8 pattern[64],
+    u64 len,
     u64 chunk_idx,
     u64 chunk_count,
     std::function<bool(const u8[64])> callback);

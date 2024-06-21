@@ -73,7 +73,7 @@ MTL::Library* metal_read_lib(MTL::Device* device, std::string_view path) {
     options->release();
 
     if (err)
-        error_metal(err, "compiling src failed: %s\n");
+        error_metal(err, "compiling src failed");
 
     return lib;
 }
@@ -110,7 +110,7 @@ ComputeFunction::ComputeFunction(MTL::Device* device, MTL::Library* lib, std::st
     this->pipeline = device->newComputePipelineState(func, &err);
 
     if (err)
-        error_metal(err, "loading pipeline failed\n");
+        error_metal(err, "loading pipeline failed");
 
     func->release();
     nname->release();
