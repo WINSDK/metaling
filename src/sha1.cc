@@ -25,39 +25,6 @@ void ubc_check(const uint32_t W[80], uint32_t dvmask[DVMASKSIZE]);
 }
 #endif
 
-static const uint32_t DV_I_43_0_bit 	= (uint32_t)(1) << 0;
-static const uint32_t DV_I_44_0_bit 	= (uint32_t)(1) << 1;
-static const uint32_t DV_I_45_0_bit 	= (uint32_t)(1) << 2;
-static const uint32_t DV_I_46_0_bit 	= (uint32_t)(1) << 3;
-static const uint32_t DV_I_46_2_bit 	= (uint32_t)(1) << 4;
-static const uint32_t DV_I_47_0_bit 	= (uint32_t)(1) << 5;
-static const uint32_t DV_I_47_2_bit 	= (uint32_t)(1) << 6;
-static const uint32_t DV_I_48_0_bit 	= (uint32_t)(1) << 7;
-static const uint32_t DV_I_48_2_bit 	= (uint32_t)(1) << 8;
-static const uint32_t DV_I_49_0_bit 	= (uint32_t)(1) << 9;
-static const uint32_t DV_I_49_2_bit 	= (uint32_t)(1) << 10;
-static const uint32_t DV_I_50_0_bit 	= (uint32_t)(1) << 11;
-static const uint32_t DV_I_50_2_bit 	= (uint32_t)(1) << 12;
-static const uint32_t DV_I_51_0_bit 	= (uint32_t)(1) << 13;
-static const uint32_t DV_I_51_2_bit 	= (uint32_t)(1) << 14;
-static const uint32_t DV_I_52_0_bit 	= (uint32_t)(1) << 15;
-static const uint32_t DV_II_45_0_bit 	= (uint32_t)(1) << 16;
-static const uint32_t DV_II_46_0_bit 	= (uint32_t)(1) << 17;
-static const uint32_t DV_II_46_2_bit 	= (uint32_t)(1) << 18;
-static const uint32_t DV_II_47_0_bit 	= (uint32_t)(1) << 19;
-static const uint32_t DV_II_48_0_bit 	= (uint32_t)(1) << 20;
-static const uint32_t DV_II_49_0_bit 	= (uint32_t)(1) << 21;
-static const uint32_t DV_II_49_2_bit 	= (uint32_t)(1) << 22;
-static const uint32_t DV_II_50_0_bit 	= (uint32_t)(1) << 23;
-static const uint32_t DV_II_50_2_bit 	= (uint32_t)(1) << 24;
-static const uint32_t DV_II_51_0_bit 	= (uint32_t)(1) << 25;
-static const uint32_t DV_II_51_2_bit 	= (uint32_t)(1) << 26;
-static const uint32_t DV_II_52_0_bit 	= (uint32_t)(1) << 27;
-static const uint32_t DV_II_53_0_bit 	= (uint32_t)(1) << 28;
-static const uint32_t DV_II_54_0_bit 	= (uint32_t)(1) << 29;
-static const uint32_t DV_II_55_0_bit 	= (uint32_t)(1) << 30;
-static const uint32_t DV_II_56_0_bit 	= (uint32_t)(1) << 31;
-
 dv_info_t sha1_dvs[] =
 {
   {1,43,0,58,0,0, { 0x08000000,0x9800000c,0xd8000010,0x08000010,0xb8000010,0x98000000,0x60000000,0x00000008,0xc0000000,0x90000014,0x10000010,0xb8000014,0x28000000,0x20000010,0x48000000,0x08000018,0x60000000,0x90000010,0xf0000010,0x90000008,0xc0000000,0x90000010,0xf0000010,0xb0000008,0x40000000,0x90000000,0xf0000010,0x90000018,0x60000000,0x90000010,0x90000010,0x90000000,0x80000000,0x00000010,0xa0000000,0x20000000,0xa0000000,0x20000010,0x00000000,0x20000010,0x20000000,0x00000010,0x20000000,0x00000010,0xa0000000,0x00000000,0x20000000,0x20000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000001,0x00000020,0x00000001,0x40000002,0x40000040,0x40000002,0x80000004,0x80000080,0x80000006,0x00000049,0x00000103,0x80000009,0x80000012,0x80000202,0x00000018,0x00000164,0x00000408,0x800000e6,0x8000004c,0x00000803,0x80000161,0x80000599 } }
@@ -94,271 +61,6 @@ dv_info_t sha1_dvs[] =
 , {2,56,0,65,0,31, { 0x2600001a,0x00000010,0x0400001c,0xcc000014,0x0c000002,0xc0000010,0xb400001c,0x3c000004,0xbc00001a,0x20000010,0x2400001c,0xec000014,0x0c000002,0xc0000010,0xb400001c,0x2c000004,0xbc000018,0xb0000010,0x0000000c,0xb8000010,0x08000018,0x78000010,0x08000014,0x70000010,0xb800001c,0xe8000000,0xb0000004,0x58000010,0xb000000c,0x48000000,0xb0000000,0xb8000010,0x98000010,0xa0000000,0x00000000,0x00000000,0x20000000,0x80000000,0x00000010,0x00000000,0x20000010,0x20000000,0x00000010,0x60000000,0x00000018,0xe0000000,0x90000000,0x30000010,0xb0000000,0x20000000,0x20000000,0xa0000000,0x00000010,0x80000000,0x20000000,0x20000000,0x20000000,0x80000000,0x00000010,0x00000000,0x20000010,0xa0000000,0x00000000,0x20000000,0x20000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000001,0x00000020,0x00000001,0x40000002,0x40000041,0x40000022,0x80000005,0xc0000082,0xc0000046 } }
 , {0,0,0,0,0,0, {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}
 };
-void ubc_check(const uint32_t W[80], uint32_t dvmask[1])
-{
-	uint32_t mask = ~((uint32_t)(0));
-	mask &= (((((W[44]^W[45])>>29)&1)-1) | ~(DV_I_48_0_bit|DV_I_51_0_bit|DV_I_52_0_bit|DV_II_45_0_bit|DV_II_46_0_bit|DV_II_50_0_bit|DV_II_51_0_bit));
-	mask &= (((((W[49]^W[50])>>29)&1)-1) | ~(DV_I_46_0_bit|DV_II_45_0_bit|DV_II_50_0_bit|DV_II_51_0_bit|DV_II_55_0_bit|DV_II_56_0_bit));
-	mask &= (((((W[48]^W[49])>>29)&1)-1) | ~(DV_I_45_0_bit|DV_I_52_0_bit|DV_II_49_0_bit|DV_II_50_0_bit|DV_II_54_0_bit|DV_II_55_0_bit));
-	mask &= ((((W[47]^(W[50]>>25))&(1<<4))-(1<<4)) | ~(DV_I_47_0_bit|DV_I_49_0_bit|DV_I_51_0_bit|DV_II_45_0_bit|DV_II_51_0_bit|DV_II_56_0_bit));
-	mask &= (((((W[47]^W[48])>>29)&1)-1) | ~(DV_I_44_0_bit|DV_I_51_0_bit|DV_II_48_0_bit|DV_II_49_0_bit|DV_II_53_0_bit|DV_II_54_0_bit));
-	mask &= (((((W[46]>>4)^(W[49]>>29))&1)-1) | ~(DV_I_46_0_bit|DV_I_48_0_bit|DV_I_50_0_bit|DV_I_52_0_bit|DV_II_50_0_bit|DV_II_55_0_bit));
-	mask &= (((((W[46]^W[47])>>29)&1)-1) | ~(DV_I_43_0_bit|DV_I_50_0_bit|DV_II_47_0_bit|DV_II_48_0_bit|DV_II_52_0_bit|DV_II_53_0_bit));
-	mask &= (((((W[45]>>4)^(W[48]>>29))&1)-1) | ~(DV_I_45_0_bit|DV_I_47_0_bit|DV_I_49_0_bit|DV_I_51_0_bit|DV_II_49_0_bit|DV_II_54_0_bit));
-	mask &= (((((W[45]^W[46])>>29)&1)-1) | ~(DV_I_49_0_bit|DV_I_52_0_bit|DV_II_46_0_bit|DV_II_47_0_bit|DV_II_51_0_bit|DV_II_52_0_bit));
-	mask &= (((((W[44]>>4)^(W[47]>>29))&1)-1) | ~(DV_I_44_0_bit|DV_I_46_0_bit|DV_I_48_0_bit|DV_I_50_0_bit|DV_II_48_0_bit|DV_II_53_0_bit));
-	mask &= (((((W[43]>>4)^(W[46]>>29))&1)-1) | ~(DV_I_43_0_bit|DV_I_45_0_bit|DV_I_47_0_bit|DV_I_49_0_bit|DV_II_47_0_bit|DV_II_52_0_bit));
-	mask &= (((((W[43]^W[44])>>29)&1)-1) | ~(DV_I_47_0_bit|DV_I_50_0_bit|DV_I_51_0_bit|DV_II_45_0_bit|DV_II_49_0_bit|DV_II_50_0_bit));
-	mask &= (((((W[42]>>4)^(W[45]>>29))&1)-1) | ~(DV_I_44_0_bit|DV_I_46_0_bit|DV_I_48_0_bit|DV_I_52_0_bit|DV_II_46_0_bit|DV_II_51_0_bit));
-	mask &= (((((W[41]>>4)^(W[44]>>29))&1)-1) | ~(DV_I_43_0_bit|DV_I_45_0_bit|DV_I_47_0_bit|DV_I_51_0_bit|DV_II_45_0_bit|DV_II_50_0_bit));
-	mask &= (((((W[40]^W[41])>>29)&1)-1) | ~(DV_I_44_0_bit|DV_I_47_0_bit|DV_I_48_0_bit|DV_II_46_0_bit|DV_II_47_0_bit|DV_II_56_0_bit));
-	mask &= (((((W[54]^W[55])>>29)&1)-1) | ~(DV_I_51_0_bit|DV_II_47_0_bit|DV_II_50_0_bit|DV_II_55_0_bit|DV_II_56_0_bit));
-	mask &= (((((W[53]^W[54])>>29)&1)-1) | ~(DV_I_50_0_bit|DV_II_46_0_bit|DV_II_49_0_bit|DV_II_54_0_bit|DV_II_55_0_bit));
-	mask &= (((((W[52]^W[53])>>29)&1)-1) | ~(DV_I_49_0_bit|DV_II_45_0_bit|DV_II_48_0_bit|DV_II_53_0_bit|DV_II_54_0_bit));
-	mask &= ((((W[50]^(W[53]>>25))&(1<<4))-(1<<4)) | ~(DV_I_50_0_bit|DV_I_52_0_bit|DV_II_46_0_bit|DV_II_48_0_bit|DV_II_54_0_bit));
-	mask &= (((((W[50]^W[51])>>29)&1)-1) | ~(DV_I_47_0_bit|DV_II_46_0_bit|DV_II_51_0_bit|DV_II_52_0_bit|DV_II_56_0_bit));
-	mask &= ((((W[49]^(W[52]>>25))&(1<<4))-(1<<4)) | ~(DV_I_49_0_bit|DV_I_51_0_bit|DV_II_45_0_bit|DV_II_47_0_bit|DV_II_53_0_bit));
-	mask &= ((((W[48]^(W[51]>>25))&(1<<4))-(1<<4)) | ~(DV_I_48_0_bit|DV_I_50_0_bit|DV_I_52_0_bit|DV_II_46_0_bit|DV_II_52_0_bit));
-	mask &= (((((W[42]^W[43])>>29)&1)-1) | ~(DV_I_46_0_bit|DV_I_49_0_bit|DV_I_50_0_bit|DV_II_48_0_bit|DV_II_49_0_bit));
-	mask &= (((((W[41]^W[42])>>29)&1)-1) | ~(DV_I_45_0_bit|DV_I_48_0_bit|DV_I_49_0_bit|DV_II_47_0_bit|DV_II_48_0_bit));
-	mask &= (((((W[40]>>4)^(W[43]>>29))&1)-1) | ~(DV_I_44_0_bit|DV_I_46_0_bit|DV_I_50_0_bit|DV_II_49_0_bit|DV_II_56_0_bit));
-	mask &= (((((W[39]>>4)^(W[42]>>29))&1)-1) | ~(DV_I_43_0_bit|DV_I_45_0_bit|DV_I_49_0_bit|DV_II_48_0_bit|DV_II_55_0_bit));
-	if (mask & (DV_I_44_0_bit|DV_I_48_0_bit|DV_II_47_0_bit|DV_II_54_0_bit|DV_II_56_0_bit))
-		mask &= (((((W[38]>>4)^(W[41]>>29))&1)-1) | ~(DV_I_44_0_bit|DV_I_48_0_bit|DV_II_47_0_bit|DV_II_54_0_bit|DV_II_56_0_bit));
-	mask &= (((((W[37]>>4)^(W[40]>>29))&1)-1) | ~(DV_I_43_0_bit|DV_I_47_0_bit|DV_II_46_0_bit|DV_II_53_0_bit|DV_II_55_0_bit));
-	if (mask & (DV_I_52_0_bit|DV_II_48_0_bit|DV_II_51_0_bit|DV_II_56_0_bit))
-		mask &= (((((W[55]^W[56])>>29)&1)-1) | ~(DV_I_52_0_bit|DV_II_48_0_bit|DV_II_51_0_bit|DV_II_56_0_bit));
-	if (mask & (DV_I_52_0_bit|DV_II_48_0_bit|DV_II_50_0_bit|DV_II_56_0_bit))
-		mask &= ((((W[52]^(W[55]>>25))&(1<<4))-(1<<4)) | ~(DV_I_52_0_bit|DV_II_48_0_bit|DV_II_50_0_bit|DV_II_56_0_bit));
-	if (mask & (DV_I_51_0_bit|DV_II_47_0_bit|DV_II_49_0_bit|DV_II_55_0_bit))
-		mask &= ((((W[51]^(W[54]>>25))&(1<<4))-(1<<4)) | ~(DV_I_51_0_bit|DV_II_47_0_bit|DV_II_49_0_bit|DV_II_55_0_bit));
-	if (mask & (DV_I_48_0_bit|DV_II_47_0_bit|DV_II_52_0_bit|DV_II_53_0_bit))
-		mask &= (((((W[51]^W[52])>>29)&1)-1) | ~(DV_I_48_0_bit|DV_II_47_0_bit|DV_II_52_0_bit|DV_II_53_0_bit));
-	if (mask & (DV_I_46_0_bit|DV_I_49_0_bit|DV_II_45_0_bit|DV_II_48_0_bit))
-		mask &= (((((W[36]>>4)^(W[40]>>29))&1)-1) | ~(DV_I_46_0_bit|DV_I_49_0_bit|DV_II_45_0_bit|DV_II_48_0_bit));
-	if (mask & (DV_I_52_0_bit|DV_II_48_0_bit|DV_II_49_0_bit))
-		mask &= ((0-(((W[53]^W[56])>>29)&1)) | ~(DV_I_52_0_bit|DV_II_48_0_bit|DV_II_49_0_bit));
-	if (mask & (DV_I_50_0_bit|DV_II_46_0_bit|DV_II_47_0_bit))
-		mask &= ((0-(((W[51]^W[54])>>29)&1)) | ~(DV_I_50_0_bit|DV_II_46_0_bit|DV_II_47_0_bit));
-	if (mask & (DV_I_49_0_bit|DV_I_51_0_bit|DV_II_45_0_bit))
-		mask &= ((0-(((W[50]^W[52])>>29)&1)) | ~(DV_I_49_0_bit|DV_I_51_0_bit|DV_II_45_0_bit));
-	if (mask & (DV_I_48_0_bit|DV_I_50_0_bit|DV_I_52_0_bit))
-		mask &= ((0-(((W[49]^W[51])>>29)&1)) | ~(DV_I_48_0_bit|DV_I_50_0_bit|DV_I_52_0_bit));
-	if (mask & (DV_I_47_0_bit|DV_I_49_0_bit|DV_I_51_0_bit))
-		mask &= ((0-(((W[48]^W[50])>>29)&1)) | ~(DV_I_47_0_bit|DV_I_49_0_bit|DV_I_51_0_bit));
-	if (mask & (DV_I_46_0_bit|DV_I_48_0_bit|DV_I_50_0_bit))
-		mask &= ((0-(((W[47]^W[49])>>29)&1)) | ~(DV_I_46_0_bit|DV_I_48_0_bit|DV_I_50_0_bit));
-	if (mask & (DV_I_45_0_bit|DV_I_47_0_bit|DV_I_49_0_bit))
-		mask &= ((0-(((W[46]^W[48])>>29)&1)) | ~(DV_I_45_0_bit|DV_I_47_0_bit|DV_I_49_0_bit));
-	mask &= ((((W[45]^W[47])&(1<<6))-(1<<6)) | ~(DV_I_47_2_bit|DV_I_49_2_bit|DV_I_51_2_bit));
-	if (mask & (DV_I_44_0_bit|DV_I_46_0_bit|DV_I_48_0_bit))
-		mask &= ((0-(((W[45]^W[47])>>29)&1)) | ~(DV_I_44_0_bit|DV_I_46_0_bit|DV_I_48_0_bit));
-	mask &= (((((W[44]^W[46])>>6)&1)-1) | ~(DV_I_46_2_bit|DV_I_48_2_bit|DV_I_50_2_bit));
-	if (mask & (DV_I_43_0_bit|DV_I_45_0_bit|DV_I_47_0_bit))
-		mask &= ((0-(((W[44]^W[46])>>29)&1)) | ~(DV_I_43_0_bit|DV_I_45_0_bit|DV_I_47_0_bit));
-	mask &= ((0-((W[41]^(W[42]>>5))&(1<<1))) | ~(DV_I_48_2_bit|DV_II_46_2_bit|DV_II_51_2_bit));
-	mask &= ((0-((W[40]^(W[41]>>5))&(1<<1))) | ~(DV_I_47_2_bit|DV_I_51_2_bit|DV_II_50_2_bit));
-	if (mask & (DV_I_44_0_bit|DV_I_46_0_bit|DV_II_56_0_bit))
-		mask &= ((0-(((W[40]^W[42])>>4)&1)) | ~(DV_I_44_0_bit|DV_I_46_0_bit|DV_II_56_0_bit));
-	mask &= ((0-((W[39]^(W[40]>>5))&(1<<1))) | ~(DV_I_46_2_bit|DV_I_50_2_bit|DV_II_49_2_bit));
-	if (mask & (DV_I_43_0_bit|DV_I_45_0_bit|DV_II_55_0_bit))
-		mask &= ((0-(((W[39]^W[41])>>4)&1)) | ~(DV_I_43_0_bit|DV_I_45_0_bit|DV_II_55_0_bit));
-	if (mask & (DV_I_44_0_bit|DV_II_54_0_bit|DV_II_56_0_bit))
-		mask &= ((0-(((W[38]^W[40])>>4)&1)) | ~(DV_I_44_0_bit|DV_II_54_0_bit|DV_II_56_0_bit));
-	if (mask & (DV_I_43_0_bit|DV_II_53_0_bit|DV_II_55_0_bit))
-		mask &= ((0-(((W[37]^W[39])>>4)&1)) | ~(DV_I_43_0_bit|DV_II_53_0_bit|DV_II_55_0_bit));
-	mask &= ((0-((W[36]^(W[37]>>5))&(1<<1))) | ~(DV_I_47_2_bit|DV_I_50_2_bit|DV_II_46_2_bit));
-	if (mask & (DV_I_45_0_bit|DV_I_48_0_bit|DV_II_47_0_bit))
-		mask &= (((((W[35]>>4)^(W[39]>>29))&1)-1) | ~(DV_I_45_0_bit|DV_I_48_0_bit|DV_II_47_0_bit));
-	if (mask & (DV_I_48_0_bit|DV_II_48_0_bit))
-		mask &= ((0-((W[63]^(W[64]>>5))&(1<<0))) | ~(DV_I_48_0_bit|DV_II_48_0_bit));
-	if (mask & (DV_I_45_0_bit|DV_II_45_0_bit))
-		mask &= ((0-((W[63]^(W[64]>>5))&(1<<1))) | ~(DV_I_45_0_bit|DV_II_45_0_bit));
-	if (mask & (DV_I_47_0_bit|DV_II_47_0_bit))
-		mask &= ((0-((W[62]^(W[63]>>5))&(1<<0))) | ~(DV_I_47_0_bit|DV_II_47_0_bit));
-	if (mask & (DV_I_46_0_bit|DV_II_46_0_bit))
-		mask &= ((0-((W[61]^(W[62]>>5))&(1<<0))) | ~(DV_I_46_0_bit|DV_II_46_0_bit));
-	mask &= ((0-((W[61]^(W[62]>>5))&(1<<2))) | ~(DV_I_46_2_bit|DV_II_46_2_bit));
-	if (mask & (DV_I_45_0_bit|DV_II_45_0_bit))
-		mask &= ((0-((W[60]^(W[61]>>5))&(1<<0))) | ~(DV_I_45_0_bit|DV_II_45_0_bit));
-	if (mask & (DV_II_51_0_bit|DV_II_54_0_bit))
-		mask &= (((((W[58]^W[59])>>29)&1)-1) | ~(DV_II_51_0_bit|DV_II_54_0_bit));
-	if (mask & (DV_II_50_0_bit|DV_II_53_0_bit))
-		mask &= (((((W[57]^W[58])>>29)&1)-1) | ~(DV_II_50_0_bit|DV_II_53_0_bit));
-	if (mask & (DV_II_52_0_bit|DV_II_54_0_bit))
-		mask &= ((((W[56]^(W[59]>>25))&(1<<4))-(1<<4)) | ~(DV_II_52_0_bit|DV_II_54_0_bit));
-	if (mask & (DV_II_51_0_bit|DV_II_52_0_bit))
-		mask &= ((0-(((W[56]^W[59])>>29)&1)) | ~(DV_II_51_0_bit|DV_II_52_0_bit));
-	if (mask & (DV_II_49_0_bit|DV_II_52_0_bit))
-		mask &= (((((W[56]^W[57])>>29)&1)-1) | ~(DV_II_49_0_bit|DV_II_52_0_bit));
-	if (mask & (DV_II_51_0_bit|DV_II_53_0_bit))
-		mask &= ((((W[55]^(W[58]>>25))&(1<<4))-(1<<4)) | ~(DV_II_51_0_bit|DV_II_53_0_bit));
-	if (mask & (DV_II_50_0_bit|DV_II_52_0_bit))
-		mask &= ((((W[54]^(W[57]>>25))&(1<<4))-(1<<4)) | ~(DV_II_50_0_bit|DV_II_52_0_bit));
-	if (mask & (DV_II_49_0_bit|DV_II_51_0_bit))
-		mask &= ((((W[53]^(W[56]>>25))&(1<<4))-(1<<4)) | ~(DV_II_49_0_bit|DV_II_51_0_bit));
-	mask &= ((((W[51]^(W[50]>>5))&(1<<1))-(1<<1)) | ~(DV_I_50_2_bit|DV_II_46_2_bit));
-	mask &= ((((W[48]^W[50])&(1<<6))-(1<<6)) | ~(DV_I_50_2_bit|DV_II_46_2_bit));
-	if (mask & (DV_I_51_0_bit|DV_I_52_0_bit))
-		mask &= ((0-(((W[48]^W[55])>>29)&1)) | ~(DV_I_51_0_bit|DV_I_52_0_bit));
-	mask &= ((((W[47]^W[49])&(1<<6))-(1<<6)) | ~(DV_I_49_2_bit|DV_I_51_2_bit));
-	mask &= ((((W[48]^(W[47]>>5))&(1<<1))-(1<<1)) | ~(DV_I_47_2_bit|DV_II_51_2_bit));
-	mask &= ((((W[46]^W[48])&(1<<6))-(1<<6)) | ~(DV_I_48_2_bit|DV_I_50_2_bit));
-	mask &= ((((W[47]^(W[46]>>5))&(1<<1))-(1<<1)) | ~(DV_I_46_2_bit|DV_II_50_2_bit));
-	mask &= ((0-((W[44]^(W[45]>>5))&(1<<1))) | ~(DV_I_51_2_bit|DV_II_49_2_bit));
-	mask &= ((((W[43]^W[45])&(1<<6))-(1<<6)) | ~(DV_I_47_2_bit|DV_I_49_2_bit));
-	mask &= (((((W[42]^W[44])>>6)&1)-1) | ~(DV_I_46_2_bit|DV_I_48_2_bit));
-	mask &= ((((W[43]^(W[42]>>5))&(1<<1))-(1<<1)) | ~(DV_II_46_2_bit|DV_II_51_2_bit));
-	mask &= ((((W[42]^(W[41]>>5))&(1<<1))-(1<<1)) | ~(DV_I_51_2_bit|DV_II_50_2_bit));
-	mask &= ((((W[41]^(W[40]>>5))&(1<<1))-(1<<1)) | ~(DV_I_50_2_bit|DV_II_49_2_bit));
-	if (mask & (DV_I_52_0_bit|DV_II_51_0_bit))
-		mask &= ((((W[39]^(W[43]>>25))&(1<<4))-(1<<4)) | ~(DV_I_52_0_bit|DV_II_51_0_bit));
-	if (mask & (DV_I_51_0_bit|DV_II_50_0_bit))
-		mask &= ((((W[38]^(W[42]>>25))&(1<<4))-(1<<4)) | ~(DV_I_51_0_bit|DV_II_50_0_bit));
-	if (mask & (DV_I_48_2_bit|DV_I_51_2_bit))
-		mask &= ((0-((W[37]^(W[38]>>5))&(1<<1))) | ~(DV_I_48_2_bit|DV_I_51_2_bit));
-	if (mask & (DV_I_50_0_bit|DV_II_49_0_bit))
-		mask &= ((((W[37]^(W[41]>>25))&(1<<4))-(1<<4)) | ~(DV_I_50_0_bit|DV_II_49_0_bit));
-	if (mask & (DV_II_52_0_bit|DV_II_54_0_bit))
-		mask &= ((0-((W[36]^W[38])&(1<<4))) | ~(DV_II_52_0_bit|DV_II_54_0_bit));
-	mask &= ((0-((W[35]^(W[36]>>5))&(1<<1))) | ~(DV_I_46_2_bit|DV_I_49_2_bit));
-	if (mask & (DV_I_51_0_bit|DV_II_47_0_bit))
-		mask &= ((((W[35]^(W[39]>>25))&(1<<3))-(1<<3)) | ~(DV_I_51_0_bit|DV_II_47_0_bit));
-if (mask) {
-
-	if (mask & DV_I_43_0_bit)
-		 if (
-			    !((W[61]^(W[62]>>5)) & (1<<1))
-			 || !(!((W[59]^(W[63]>>25)) & (1<<5)))
-			 || !((W[58]^(W[63]>>30)) & (1<<0))
-		 )  mask &= ~DV_I_43_0_bit;
-	if (mask & DV_I_44_0_bit)
-		 if (
-			    !((W[62]^(W[63]>>5)) & (1<<1))
-			 || !(!((W[60]^(W[64]>>25)) & (1<<5)))
-			 || !((W[59]^(W[64]>>30)) & (1<<0))
-		 )  mask &= ~DV_I_44_0_bit;
-	if (mask & DV_I_46_2_bit)
-		mask &= ((~((W[40]^W[42])>>2)) | ~DV_I_46_2_bit);
-	if (mask & DV_I_47_2_bit)
-		 if (
-			    !((W[62]^(W[63]>>5)) & (1<<2))
-			 || !(!((W[41]^W[43]) & (1<<6)))
-		 )  mask &= ~DV_I_47_2_bit;
-	if (mask & DV_I_48_2_bit)
-		 if (
-			    !((W[63]^(W[64]>>5)) & (1<<2))
-			 || !(!((W[48]^(W[49]<<5)) & (1<<6)))
-		 )  mask &= ~DV_I_48_2_bit;
-	if (mask & DV_I_49_2_bit)
-		 if (
-			    !(!((W[49]^(W[50]<<5)) & (1<<6)))
-			 || !((W[42]^W[50]) & (1<<1))
-			 || !(!((W[39]^(W[40]<<5)) & (1<<6)))
-			 || !((W[38]^W[40]) & (1<<1))
-		 )  mask &= ~DV_I_49_2_bit;
-	if (mask & DV_I_50_0_bit)
-		mask &= ((((W[36]^W[37])<<7)) | ~DV_I_50_0_bit);
-	if (mask & DV_I_50_2_bit)
-		mask &= ((((W[43]^W[51])<<11)) | ~DV_I_50_2_bit);
-	if (mask & DV_I_51_0_bit)
-		mask &= ((((W[37]^W[38])<<9)) | ~DV_I_51_0_bit);
-	if (mask & DV_I_51_2_bit)
-		 if (
-			    !(!((W[51]^(W[52]<<5)) & (1<<6)))
-			 || !(!((W[49]^W[51]) & (1<<6)))
-			 || !(!((W[37]^(W[37]>>5)) & (1<<1)))
-			 || !(!((W[35]^(W[39]>>25)) & (1<<5)))
-		 )  mask &= ~DV_I_51_2_bit;
-	if (mask & DV_I_52_0_bit)
-		mask &= ((((W[38]^W[39])<<11)) | ~DV_I_52_0_bit);
-	if (mask & DV_II_46_2_bit)
-		mask &= ((((W[47]^W[51])<<17)) | ~DV_II_46_2_bit);
-	if (mask & DV_II_48_0_bit)
-		 if (
-			    !(!((W[36]^(W[40]>>25)) & (1<<3)))
-			 || !((W[35]^(W[40]<<2)) & (1<<30))
-		 )  mask &= ~DV_II_48_0_bit;
-	if (mask & DV_II_49_0_bit)
-		 if (
-			    !(!((W[37]^(W[41]>>25)) & (1<<3)))
-			 || !((W[36]^(W[41]<<2)) & (1<<30))
-		 )  mask &= ~DV_II_49_0_bit;
-	if (mask & DV_II_49_2_bit)
-		 if (
-			    !(!((W[53]^(W[54]<<5)) & (1<<6)))
-			 || !(!((W[51]^W[53]) & (1<<6)))
-			 || !((W[50]^W[54]) & (1<<1))
-			 || !(!((W[45]^(W[46]<<5)) & (1<<6)))
-			 || !(!((W[37]^(W[41]>>25)) & (1<<5)))
-			 || !((W[36]^(W[41]>>30)) & (1<<0))
-		 )  mask &= ~DV_II_49_2_bit;
-	if (mask & DV_II_50_0_bit)
-		 if (
-			    !((W[55]^W[58]) & (1<<29))
-			 || !(!((W[38]^(W[42]>>25)) & (1<<3)))
-			 || !((W[37]^(W[42]<<2)) & (1<<30))
-		 )  mask &= ~DV_II_50_0_bit;
-	if (mask & DV_II_50_2_bit)
-		 if (
-			    !(!((W[54]^(W[55]<<5)) & (1<<6)))
-			 || !(!((W[52]^W[54]) & (1<<6)))
-			 || !((W[51]^W[55]) & (1<<1))
-			 || !((W[45]^W[47]) & (1<<1))
-			 || !(!((W[38]^(W[42]>>25)) & (1<<5)))
-			 || !((W[37]^(W[42]>>30)) & (1<<0))
-		 )  mask &= ~DV_II_50_2_bit;
-	if (mask & DV_II_51_0_bit)
-		 if (
-			    !(!((W[39]^(W[43]>>25)) & (1<<3)))
-			 || !((W[38]^(W[43]<<2)) & (1<<30))
-		 )  mask &= ~DV_II_51_0_bit;
-	if (mask & DV_II_51_2_bit)
-		 if (
-			    !(!((W[55]^(W[56]<<5)) & (1<<6)))
-			 || !(!((W[53]^W[55]) & (1<<6)))
-			 || !((W[52]^W[56]) & (1<<1))
-			 || !((W[46]^W[48]) & (1<<1))
-			 || !(!((W[39]^(W[43]>>25)) & (1<<5)))
-			 || !((W[38]^(W[43]>>30)) & (1<<0))
-		 )  mask &= ~DV_II_51_2_bit;
-	if (mask & DV_II_52_0_bit)
-		 if (
-			    !(!((W[59]^W[60]) & (1<<29)))
-			 || !(!((W[40]^(W[44]>>25)) & (1<<3)))
-			 || !(!((W[40]^(W[44]>>25)) & (1<<4)))
-			 || !((W[39]^(W[44]<<2)) & (1<<30))
-		 )  mask &= ~DV_II_52_0_bit;
-	if (mask & DV_II_53_0_bit)
-		 if (
-			    !((W[58]^W[61]) & (1<<29))
-			 || !(!((W[57]^(W[61]>>25)) & (1<<4)))
-			 || !(!((W[41]^(W[45]>>25)) & (1<<3)))
-			 || !(!((W[41]^(W[45]>>25)) & (1<<4)))
-		 )  mask &= ~DV_II_53_0_bit;
-	if (mask & DV_II_54_0_bit)
-		 if (
-			    !(!((W[58]^(W[62]>>25)) & (1<<4)))
-			 || !(!((W[42]^(W[46]>>25)) & (1<<3)))
-			 || !(!((W[42]^(W[46]>>25)) & (1<<4)))
-		 )  mask &= ~DV_II_54_0_bit;
-	if (mask & DV_II_55_0_bit)
-		 if (
-			    !(!((W[59]^(W[63]>>25)) & (1<<4)))
-			 || !(!((W[57]^(W[59]>>25)) & (1<<4)))
-			 || !(!((W[43]^(W[47]>>25)) & (1<<3)))
-			 || !(!((W[43]^(W[47]>>25)) & (1<<4)))
-		 )  mask &= ~DV_II_55_0_bit;
-	if (mask & DV_II_56_0_bit)
-		 if (
-			    !(!((W[60]^(W[64]>>25)) & (1<<4)))
-			 || !(!((W[44]^(W[48]>>25)) & (1<<3)))
-			 || !(!((W[44]^(W[48]>>25)) & (1<<4)))
-		 )  mask &= ~DV_II_56_0_bit;
-}
-
-	dvmask[0]=mask;
-}
 
 #include <string.h>
 #include <memory.h>
@@ -407,60 +109,6 @@ if (mask) {
 
 /* Not under GCC-alike */
 #elif defined(__BYTE_ORDER) && defined(__BIG_ENDIAN)
-/*
- * Should detect Big Endian under glibc.git since 14245eb70e ("entered
- * into RCS", 1992-11-25). Defined in <endian.h> which will have been
- * brought in by standard headers. See glibc.git and
- * https://sourceforge.net/p/predef/wiki/Endianness/
- */
-#if __BYTE_ORDER == __BIG_ENDIAN
-#define SHA1DC_BIGENDIAN
-#endif
-
-/* Not under GCC-alike or glibc */
-#elif defined(_BYTE_ORDER) && defined(_BIG_ENDIAN) && defined(_LITTLE_ENDIAN)
-/*
- * *BSD and newlib (embedded linux, cygwin, etc).
- * the defined(_BIG_ENDIAN) && defined(_LITTLE_ENDIAN) part prevents
- * this condition from matching with Solaris/sparc.
- * (Solaris defines only one endian macro)
- */
-#if _BYTE_ORDER == _BIG_ENDIAN
-#define SHA1DC_BIGENDIAN
-#endif
-
-/* Not under GCC-alike or glibc or *BSD or newlib */
-#elif (defined(__ARMEB__) || defined(__THUMBEB__) || defined(__AARCH64EB__) || \
-       defined(__MIPSEB__) || defined(__MIPSEB) || defined(_MIPSEB) || \
-       defined(__sparc))
-/*
- * Should define Big Endian for a whitelist of known processors. See
- * https://sourceforge.net/p/predef/wiki/Endianness/ and
- * https://web.archive.org/web/20140421151132/http://www.perforce.com/perforce/doc.current/manuals/p4sag/chapter.superuser.html
- */
-#define SHA1DC_BIGENDIAN
-
-/* Not under GCC-alike or glibc or *BSD or newlib or <processor whitelist> */
-#elif (defined(_AIX) || defined(__hpux))
-
-/*
- * Defines Big Endian on a whitelist of OSs that are known to be Big
- * Endian-only. See
- * https://lore.kernel.org/git/93056823-2740-d072-1ebd-46b440b33d7e@felt.demon.nl/
- */
-#define SHA1DC_BIGENDIAN
-
-/* Not under GCC-alike or glibc or *BSD or newlib or <processor whitelist> or <os whitelist> */
-#elif defined(SHA1DC_ON_INTEL_LIKE_PROCESSOR)
-/*
- * As a last resort before we do anything else we're not 100% sure
- * about below, we blacklist specific processors here. We could add
- * more, see e.g. https://wiki.debian.org/ArchitectureSpecificsMemo
- */
-#else /* Not under GCC-alike or glibc or *BSD or newlib or <processor whitelist> or <os whitelist> or <processor blacklist> */
-
-/* We do nothing more here for now */
-/*#error "Uncomment this to see if you fall through all the detection"*/
 
 #endif /* Big Endian detection */
 
@@ -534,108 +182,6 @@ if (mask) {
 
 
 #define SHA1_STORE_STATE(i) states[i][0] = a; states[i][1] = b; states[i][2] = c; states[i][3] = d; states[i][4] = e;
-
-#ifdef BUILDNOCOLLDETECTSHA1COMPRESSION
-void sha1_compression(uint32_t ihv[5], const uint32_t m[16])
-{
-	uint32_t W[80];
-	uint32_t a,b,c,d,e;
-	unsigned i;
-
-	memcpy(W, m, 16 * 4);
-	for (i = 16; i < 80; ++i)
-		W[i] = sha1_mix(W, i);
-
-	a = ihv[0]; b = ihv[1]; c = ihv[2]; d = ihv[3]; e = ihv[4];
-
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(a, b, c, d, e, W, 0);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(e, a, b, c, d, W, 1);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(d, e, a, b, c, W, 2);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(c, d, e, a, b, W, 3);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(b, c, d, e, a, W, 4);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(a, b, c, d, e, W, 5);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(e, a, b, c, d, W, 6);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(d, e, a, b, c, W, 7);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(c, d, e, a, b, W, 8);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(b, c, d, e, a, W, 9);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(a, b, c, d, e, W, 10);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(e, a, b, c, d, W, 11);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(d, e, a, b, c, W, 12);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(c, d, e, a, b, W, 13);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(b, c, d, e, a, W, 14);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(a, b, c, d, e, W, 15);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(e, a, b, c, d, W, 16);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(d, e, a, b, c, W, 17);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(c, d, e, a, b, W, 18);
-	HASHCLASH_SHA1COMPRESS_ROUND1_STEP(b, c, d, e, a, W, 19);
-
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(a, b, c, d, e, W, 20);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(e, a, b, c, d, W, 21);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(d, e, a, b, c, W, 22);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(c, d, e, a, b, W, 23);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(b, c, d, e, a, W, 24);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(a, b, c, d, e, W, 25);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(e, a, b, c, d, W, 26);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(d, e, a, b, c, W, 27);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(c, d, e, a, b, W, 28);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(b, c, d, e, a, W, 29);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(a, b, c, d, e, W, 30);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(e, a, b, c, d, W, 31);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(d, e, a, b, c, W, 32);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(c, d, e, a, b, W, 33);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(b, c, d, e, a, W, 34);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(a, b, c, d, e, W, 35);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(e, a, b, c, d, W, 36);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(d, e, a, b, c, W, 37);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(c, d, e, a, b, W, 38);
-	HASHCLASH_SHA1COMPRESS_ROUND2_STEP(b, c, d, e, a, W, 39);
-
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(a, b, c, d, e, W, 40);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(e, a, b, c, d, W, 41);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(d, e, a, b, c, W, 42);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(c, d, e, a, b, W, 43);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(b, c, d, e, a, W, 44);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(a, b, c, d, e, W, 45);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(e, a, b, c, d, W, 46);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(d, e, a, b, c, W, 47);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(c, d, e, a, b, W, 48);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(b, c, d, e, a, W, 49);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(a, b, c, d, e, W, 50);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(e, a, b, c, d, W, 51);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(d, e, a, b, c, W, 52);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(c, d, e, a, b, W, 53);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(b, c, d, e, a, W, 54);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(a, b, c, d, e, W, 55);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(e, a, b, c, d, W, 56);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(d, e, a, b, c, W, 57);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(c, d, e, a, b, W, 58);
-	HASHCLASH_SHA1COMPRESS_ROUND3_STEP(b, c, d, e, a, W, 59);
-
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(a, b, c, d, e, W, 60);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(e, a, b, c, d, W, 61);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(d, e, a, b, c, W, 62);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(c, d, e, a, b, W, 63);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(b, c, d, e, a, W, 64);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(a, b, c, d, e, W, 65);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(e, a, b, c, d, W, 66);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(d, e, a, b, c, W, 67);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(c, d, e, a, b, W, 68);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(b, c, d, e, a, W, 69);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(a, b, c, d, e, W, 70);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(e, a, b, c, d, W, 71);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(d, e, a, b, c, W, 72);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(c, d, e, a, b, W, 73);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(b, c, d, e, a, W, 74);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(a, b, c, d, e, W, 75);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(e, a, b, c, d, W, 76);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(d, e, a, b, c, W, 77);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(c, d, e, a, b, W, 78);
-	HASHCLASH_SHA1COMPRESS_ROUND4_STEP(b, c, d, e, a, W, 79);
-
-	ihv[0] += a; ihv[1] += b; ihv[2] += c; ihv[3] += d; ihv[4] += e;
-}
-#endif /*BUILDNOCOLLDETECTSHA1COMPRESSION*/
-
 
 static void sha1_compression_W(uint32_t ihv[5], const uint32_t W[80])
 {
@@ -2062,10 +1608,6 @@ static void sha1_recompression_step(uint32_t step, uint32_t ihvin[5], uint32_t i
 
 static void sha1_process(SHA1_CTX* ctx, const uint32_t block[16])
 {
-	unsigned i, j;
-	uint32_t ubc_dv_mask[DVMASKSIZE] = { 0xFFFFFFFF };
-	uint32_t ihvtmp[5];
-
 	ctx->ihv1[0] = ctx->ihv[0];
 	ctx->ihv1[1] = ctx->ihv[1];
 	ctx->ihv1[2] = ctx->ihv[2];
@@ -2073,36 +1615,6 @@ static void sha1_process(SHA1_CTX* ctx, const uint32_t block[16])
 	ctx->ihv1[4] = ctx->ihv[4];
 
 	sha1_compression_states(ctx->ihv, block, ctx->m1, ctx->states);
-
-	if (ctx->detect_coll)
-	{
-		if (ctx->ubc_check)
-		{
-			ubc_check(ctx->m1, ubc_dv_mask);
-		}
-
-		if (ubc_dv_mask[0] != 0)
-		{
-			for (i = 0; sha1_dvs[i].dvType != 0; ++i)
-			{
-				if (ubc_dv_mask[0] & ((uint32_t)(1) << sha1_dvs[i].maskb))
-				{
-					for (j = 0; j < 80; ++j)
-						ctx->m2[j] = ctx->m1[j] ^ sha1_dvs[i].dm[j];
-
-					sha1_recompression_step(sha1_dvs[i].testt, ctx->ihv2, ihvtmp, ctx->m2, ctx->states[sha1_dvs[i].testt]);
-
-					/* to verify SHA-1 collision detection code with collisions for reduced-step SHA-1 */
-					if ((0 == ((ihvtmp[0] ^ ctx->ihv[0]) | (ihvtmp[1] ^ ctx->ihv[1]) | (ihvtmp[2] ^ ctx->ihv[2]) | (ihvtmp[3] ^ ctx->ihv[3]) | (ihvtmp[4] ^ ctx->ihv[4])))
-						|| (ctx->reduced_round_coll && 0==((ctx->ihv1[0] ^ ctx->ihv2[0]) | (ctx->ihv1[1] ^ ctx->ihv2[1]) | (ctx->ihv1[2] ^ ctx->ihv2[2]) | (ctx->ihv1[3] ^ ctx->ihv2[3]) | (ctx->ihv1[4] ^ ctx->ihv2[4]))))
-					{
-						ctx->found_collision = 1;
-						break;
-					}
-				}
-			}
-		}
-	}
 }
 
 void SHA1DCInit(SHA1_CTX* ctx)
@@ -2113,42 +1625,8 @@ void SHA1DCInit(SHA1_CTX* ctx)
 	ctx->ihv[2] = 0x98BADCFE;
 	ctx->ihv[3] = 0x10325476;
 	ctx->ihv[4] = 0xC3D2E1F0;
-	ctx->found_collision = 0;
-	ctx->ubc_check = 1;
-	ctx->detect_coll = 1;
-	ctx->reduced_round_coll = 0;
-	ctx->callback = NULL;
 }
 
-
-void SHA1DCSetUseUBC(SHA1_CTX* ctx, int ubc_check)
-{
-	if (ubc_check)
-		ctx->ubc_check = 1;
-	else
-		ctx->ubc_check = 0;
-}
-
-void SHA1DCSetUseDetectColl(SHA1_CTX* ctx, int detect_coll)
-{
-	if (detect_coll)
-		ctx->detect_coll = 1;
-	else
-		ctx->detect_coll = 0;
-}
-
-void SHA1DCSetDetectReducedRoundCollision(SHA1_CTX* ctx, int reduced_round_coll)
-{
-	if (reduced_round_coll)
-		ctx->reduced_round_coll = 1;
-	else
-		ctx->reduced_round_coll = 0;
-}
-
-void SHA1DCSetCallback(SHA1_CTX* ctx, collision_block_callback callback)
-{
-	ctx->callback = callback;
-}
 
 void SHA1DCUpdate(SHA1_CTX* ctx, const char* buf, size_t len)
 {
@@ -2197,7 +1675,7 @@ static const unsigned char sha1_padding[64] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-int SHA1DCFinal(unsigned char output[20], SHA1_CTX *ctx)
+void SHA1DCFinal(unsigned char output[20], SHA1_CTX *ctx)
 {
 	uint32_t last = ctx->total & 63;
 	uint32_t padn = (last < 56) ? (56 - last) : (120 - last);
@@ -2235,5 +1713,4 @@ int SHA1DCFinal(unsigned char output[20], SHA1_CTX *ctx)
 	output[17] = (unsigned char)(ctx->ihv[4] >> 16);
 	output[18] = (unsigned char)(ctx->ihv[4] >> 8);
 	output[19] = (unsigned char)(ctx->ihv[4]);
-	return ctx->found_collision;
 }

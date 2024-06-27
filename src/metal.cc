@@ -72,21 +72,26 @@ MTL::Library* metal_read_lib(MTL::Device* device, std::string_view path) {
     MTL::Library* lib = device->newLibrary(ncode, options, &err);
     options->release();
 
-    if (err)
+    if (!lib)
         error_metal(err, "compiling src failed");
 
     return lib;
 }
 
 ComputeKernel::ComputeKernel(std::string_view src_path) {
-    NS::Array* devices = MTL::CopyAllDevices();
-    auto device = static_cast<MTL::Device*>(devices->object(0));
+    static std::atomic<MTL::Device*> g_device = nullptr;
 
-    printf("found device: %s\n", device->name()->utf8String());
+    this->device = g_device.load();
+    if (!this->device) {
+        NS::Array* devices = MTL::CopyAllDevices();
+        this->device = static_cast<MTL::Device*>(devices->object(0));
+        g_device.store(this->device);
 
-    this->device = device;
-    this->queue = device->newCommandQueue();
-    this->lib = metal_read_lib(device, src_path);
+        printf("found device: %s\n", this->device->name()->utf8String());
+    }
+
+    this->queue = this->device->newCommandQueue();
+    this->lib = metal_read_lib(this->device, src_path);
 }
 
 ComputeKernel::~ComputeKernel() {
@@ -109,7 +114,7 @@ ComputeFunction::ComputeFunction(MTL::Device* device, MTL::Library* lib, std::st
     NS::Error* err = nullptr;
     this->pipeline = device->newComputePipelineState(func, &err);
 
-    if (err)
+    if (!this->pipeline)
         error_metal(err, "loading pipeline failed");
 
     func->release();
@@ -167,7 +172,7 @@ void ComputeFunction::execute(ComputeKernel* kern) {
 
     // Write back the output buffers.
     for (ComputeBuffer& buf : this->bufs)
-        if (buf.ty == BUF_OUT)
+        if (buf.ty == BUF_OUT || buf.ty == BUF_INOUT)
             memcpy(buf.data, buf.mtl->contents(), buf.size);
 }
 
@@ -175,4 +180,34 @@ u64 align_size(u64 size) {
     if ((size % PAGE_SIZE) != 0)
         size += (PAGE_SIZE - (size % PAGE_SIZE));
     return size;
+}
+
+void start_capture(std::string path) {
+    setenv("MTL_CAPTURE_ENABLED", "1", 0);
+    fs::remove_all(path);
+
+    NS::Array* devices = MTL::CopyAllDevices();
+    auto device = static_cast<MTL::Device*>(devices->object(0));
+
+    auto descriptor = MTL::CaptureDescriptor::alloc()->init();
+    descriptor->setCaptureObject(device);
+
+    if (!path.empty()) {
+        auto string = NS::String::string(path.c_str(), NS::UTF8StringEncoding);
+        auto url = NS::URL::fileURLWithPath(string);
+        descriptor->setDestination(MTL::CaptureDestinationGPUTraceDocument);
+        descriptor->setOutputURL(url);
+    }
+
+    auto manager = MTL::CaptureManager::sharedCaptureManager();
+    NS::Error* err;
+    bool started = manager->startCapture(descriptor, &err);
+    descriptor->release();
+    if (!started)
+        error_metal(err, "start capture failed");
+}
+
+void stop_capture() {
+  auto manager = MTL::CaptureManager::sharedCaptureManager();
+  manager->stopCapture();
 }

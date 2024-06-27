@@ -53,7 +53,7 @@ target_link_libraries(
     ${FOUNDATION_LIB}
 )
 
-add_compile_definitions(${MLX_METAL_VERSION})
+add_compile_definitions(${METAL_VERSION})
 
 # -----------------------------------------------------------
 
@@ -98,5 +98,6 @@ target_sources(metaling PRIVATE
     src/metal.cc
     src/hash.cc
     src/sha1.cc
+    src/tests.cc
     src/common.cc
 )

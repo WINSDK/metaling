@@ -70,13 +70,29 @@ void mac_to_bytes(std::string_view mac, u8 out_mac[6]) {
 
 std::string bytes_to_digest(const u8* bytes, u64 len) {
     std::ostringstream oss;
-    for (u64 idx = 0; idx < len; ++idx) {
+    for (u64 idx = 0; idx < len; idx++) {
         auto byte = static_cast<int>(bytes[idx]);
         oss << std::setw(2) << std::setfill('0') << std::hex << byte;
     }
 
     return oss.str();
 }
+
+void digest_to_bytes(std::string_view digest, void* buffer, u64 len) {
+    if (digest.size() != len * 2)
+        error("invalid digest length");
+
+    u8* byteBuffer = static_cast<u8*>(buffer);
+    for (u64 idx = 0; idx < len; idx++) {
+        std::string byteString = std::string(digest.substr(idx * 2, 2));
+
+        if (!std::isxdigit(byteString[0]) || !std::isxdigit(byteString[1]))
+            error("invalid character in digest");
+
+        byteBuffer[idx] = static_cast<u8>(std::stoul(byteString, nullptr, 16));
+    }
+}
+
 
 void generate_example(const char* pmk, const u8 mac_ap[6], const u8 mac_sta[6], u32 out_hash[5]) {
     u8 pmk_padded[64] = {0};
@@ -160,12 +176,12 @@ inline void initialize_indices(u64 current_idx, u32 indices[], const u32 set_siz
 #define MAX_LEN 64
 
 void generate_permutations(
-    const u8 pattern[64],
+    const u8 pattern[MAX_LEN],
     u64 len,
     u64 chunk_idx,
     u64 chunk_count,
-    std::function<bool(const u8[64])> callback) {
-    u8 current[64] = {0};
+    std::function<bool(const u8[MAX_LEN])> callback) {
+    u8 current[MAX_LEN] = {0};
 
     if (chunk_idx >= chunk_count)
         error("idx %lld, is out of range of chunk count %lld\n", chunk_idx, chunk_count);
