@@ -93,11 +93,16 @@ target_compile_options(metaling PRIVATE
     -ggnu-pubnames
 )
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 target_sources(metaling PRIVATE
     src/main.cc
-    src/metal.cc
-    src/hash.cc
-    src/sha1.cc
     src/tests.cc
+    src/metal.cc
     src/common.cc
+    src/hash.cc
+    src/backend/metal/metal.cc
+    src/backend/cpu/hash.cc
+    src/backend/cpu/cpu.cc
+    src/backend/cpu/sha1.cc
 )

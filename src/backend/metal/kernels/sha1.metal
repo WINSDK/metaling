@@ -100,6 +100,7 @@ kernel void sha1(device const u8* data, device u32 hash[5], device const u64& le
     d = H[3];
     e = H[4];
 
+    #pragma unroll
     for (u32 idx = 0; idx < 80; idx++) {
         if (idx < 20) {
             f = (b & c) | ((~b) & d);

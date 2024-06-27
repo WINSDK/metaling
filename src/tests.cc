@@ -1,8 +1,6 @@
-#include "Metal/MTLComputePipeline.hpp"
 #include "common.hpp"
 #include "hash.hpp"
 #include "metal.hpp"
-#include "sha1.hpp"
 
 namespace tests {
 
@@ -78,7 +76,9 @@ void sha1() {
     NS::Array* devices = MTL::CopyAllDevices();
     auto device = static_cast<MTL::Device*>(devices->object(0));
     MTL::CommandQueue* queue = device->newCommandQueue();
-    MTL::Library* lib = metal_read_lib(device, std::string(ROOT_DIR) + "/src/sha1.metal");
+
+    std::string path = std::string(ROOT_DIR) + "/src/backend/metal/kernels/sha1.metal";
+    MTL::Library* lib = metal_read_lib(device, path);
 
     auto nname = NS::String::string("sha1", NS::UTF8StringEncoding);
     MTL::Function* func = lib->newFunction(nname);
@@ -107,8 +107,6 @@ void sha1() {
     encoder->setBuffer(input_buf, 0, 0);
     encoder->setBuffer(hash_buf, 0, 1);
     encoder->setBytes(&input_len, sizeof(input_len), 2);
-
-    // u64 tgp_size = kernel->maxTotalThreadsPerThreadgroup();
 
     MTL::Size group_dims = MTL::Size(1, 1, 1);
     MTL::Size grid_dims = MTL::Size(1, 1, 1);
@@ -146,7 +144,7 @@ void run() {
 
     start_capture("metaling.gputrace");
 
-    std::string path = std::string(ROOT_DIR) + "/src/math.metal";
+    std::string path = std::string(ROOT_DIR) + "/src/backend/metal/kernels/math.metal";
     ComputeKernel kern = ComputeKernel(path);
     example_add(&kern);
     example_mul_buffered(&kern);
