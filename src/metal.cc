@@ -67,8 +67,8 @@ MTL::Library* metal_read_lib(MTL::Device* device, std::string_view path) {
 
     NS::Error* err = nullptr;
     auto options = MTL::CompileOptions::alloc()->init();
-
     options->setLanguageVersion(get_metal_version());
+
     MTL::Library* lib = device->newLibrary(ncode, options, &err);
     options->release();
 
