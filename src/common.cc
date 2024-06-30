@@ -7,8 +7,9 @@
     va_list arglist;
 
     va_start(arglist, fmt);
-    fprintf(stderr, "\033[1;31m" "error: " "\033[0m");
+    fprintf(stderr, "\033[1;31m" "error: " "\033[0m" "\033[1m");
     vfprintf(stderr, fmt, arglist);
+    fprintf(stderr, "\033[0m");
     va_end(arglist);
 
     _exit(1);

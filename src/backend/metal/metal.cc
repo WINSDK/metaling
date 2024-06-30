@@ -61,10 +61,12 @@ void dispatch(GlobalContext *ctx) {
 
     encoder->dispatchThreadgroups(grid_dims, group_dims);
     encoder->endEncoding();
-    // encoder->release();
+    encoder->release();
 
     cmd_buf->commit();
-    // cmd_buf->waitUntilCompleted();
+    cmd_buf->waitUntilCompleted();
+    cmd_buf->release();
+    exit(0);
 
     auto start = high_resolution_clock::now();
 
@@ -84,9 +86,6 @@ void dispatch(GlobalContext *ctx) {
     }
 
     printf("found it!\n");
-
-    cmd_buf->release();
-    encoder->release();
 
     ctx_buf->release();
 
@@ -121,9 +120,7 @@ void main(const char* pattern) {
     ::hash::mac_to_bytes("66:77:88:99:AA:BB", ctx.mac_sta);
     ::hash::generate_example("lola1", ctx.mac_ap, ctx.mac_sta, ctx.target_hash);
 
-    start_capture("./capturing.gputrace");
     dispatch(&ctx);
-    stop_capture();
 
     // We showed the progress bar, so print a newline.
     // if (gctx.total_hash_count->load() >= PRINT_INTERVAL)

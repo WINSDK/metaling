@@ -3161,6 +3161,7 @@ bool pmkid(
         thread u64 &hash_count,
         thread u8 msg[20],
         thread const u8 current[64]) {
+
     sha1_hmac_init(hmac_ctx, (thread const u32*)current, 64);
     sha1_hmac_update(hmac_ctx, (thread u32*)msg, 20);
     sha1_hmac_final(hmac_ctx);
@@ -3181,12 +3182,13 @@ bool pmkid(
     }
 
     #pragma unroll
-    for (u64 jdx = 0; jdx < 5; jdx++)
-        if (hash[jdx] != ctx->target_hash[jdx])
+    for (u64 idx = 0; idx < 5; idx++)
+        if (hash[idx] != ctx->target_hash[idx])
             // Keep looking for matching hashes.
             return true;
 
     // Notify CPU of the passphrase we found.
+    #pragma unroll
     for (u64 idx = 0; idx < 64; idx++)
         ctx->passphrase[idx] = current[idx];
     ctx->found_passphrase = true;
