@@ -1,11 +1,8 @@
 #include <functional>
 
-#include "src/hash.hpp"
 #include "src/common.hpp"
 #include "src/backend/cpu/hash.hpp"
 #include "src/backend/cpu/sha1.hpp"
-
-using namespace ::hash;
 
 namespace cpu::hash {
 
@@ -81,7 +78,7 @@ void generate_permutations(
         error("chunk count of 0 is not supported.\n");
 
     // Precompute character sets for each position in the pattern.
-    const u8* char_sets[MAX_LEN];
+    const char* char_sets[MAX_LEN];
     u32 set_sizes[MAX_LEN];
 
     for (u64 idx = 0; idx < len; idx++) {
@@ -117,7 +114,7 @@ void generate_permutations(
 
     // Calculate the total number of permutations.
     u64 perms = 1;
-    for (u64 idx = 0; idx < len; ++idx)
+    for (u64 idx = 0; idx < len; idx++)
         perms *= set_sizes[idx];
 
     // Calculate the range of permutations this chunk will handle.

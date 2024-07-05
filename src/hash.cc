@@ -51,35 +51,4 @@ void generate_example(const char* pmk, const u8 mac_ap[6], const u8 mac_sta[6], 
     cpu::hash::pmkid(pmk_padded, mac_ap, mac_sta, out_hash);
 }
 
-u64 calculate_total_hashes(std::string_view pattern) {
-    u64 perms = 1;
-
-    for (u64 idx = 0; idx < pattern.length(); idx++) {
-        switch (pattern[idx]) {
-            case 'd':
-                perms *= sizeof(DIGITS);
-                break;
-            case 'l':
-                perms *= sizeof(LOWERCASE);
-                break;
-            case 'u':
-                perms *= sizeof(UPPERCASE);
-                break;
-            case 'a':
-                perms *= sizeof(ALPHA);
-                break;
-            case 'n':
-                perms *= sizeof(ALPHA_NUM);
-                break;
-            case '?':
-                perms *= sizeof(ANY);
-                break;
-            default:
-                error("invalid pattern character '%c'\n", pattern[idx]);
-        }
-    }
-
-    return perms;
-}
-
 }

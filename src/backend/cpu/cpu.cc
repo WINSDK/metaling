@@ -103,7 +103,7 @@ void main(const char* pattern) {
     if (pattern_len > 63)
         error("input patterns must be less than 63 characters");
 
-    u64 hashes_to_check = ::hash::calculate_total_hashes(pattern);
+    u64 hashes_to_check = 100; // broken
     printf("hashes to check: %lld\n", hashes_to_check);
 
     u64 thread_count = std::thread::hardware_concurrency();

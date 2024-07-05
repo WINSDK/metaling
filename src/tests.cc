@@ -5,12 +5,14 @@
 namespace tests {
 
 void sha1() {
+    auto pool = metal::new_scoped_memory_pool();
+
     NS::Array* devices = MTL::CopyAllDevices();
     auto device = static_cast<MTL::Device*>(devices->object(0));
     MTL::CommandQueue* queue = device->newCommandQueue();
 
     std::string path = std::string(ROOT_DIR) + "/src/backend/metal/kernels/sha1_simple.metal";
-    MTL::Library* lib = metal_read_lib(device, path);
+    MTL::Library* lib = metal::read_lib(device, path);
 
     auto nname = NS::String::string("sha1", NS::UTF8StringEncoding);
     MTL::Function* func = lib->newFunction(nname);
@@ -45,22 +47,11 @@ void sha1() {
 
     encoder->dispatchThreadgroups(grid_dims, group_dims);
     encoder->endEncoding();
-    encoder->release();
 
     cmd_buf->commit();
     cmd_buf->waitUntilCompleted();
-    cmd_buf->release();
 
     memcpy(hash, hash_buf->contents(), sizeof(hash));
-
-    input_buf->release();
-    hash_buf->release();
-
-    kernel->release();
-    func->release();
-    lib->release();
-    device->release();
-    devices->release();
 
     std::string exp = "a110e6b9a361653a042e3f5dfbac4c6105693789";
     std::string got = hash::bytes_to_digest((u8*)hash, sizeof(hash));
@@ -72,12 +63,14 @@ void sha1() {
 }
 
 void sha1_hmac() {
+    auto pool = metal::new_scoped_memory_pool();
+
     NS::Array* devices = MTL::CopyAllDevices();
     auto device = static_cast<MTL::Device*>(devices->object(0));
     MTL::CommandQueue* queue = device->newCommandQueue();
 
     std::string path = std::string(ROOT_DIR) + "/src/backend/metal/kernels/sha1.metal";
-    MTL::Library* lib = metal_read_lib(device, path);
+    MTL::Library* lib = metal::read_lib(device, path);
 
     auto nname = NS::String::string("test_sha1_hmac", NS::UTF8StringEncoding);
     MTL::Function* func = lib->newFunction(nname);
@@ -106,21 +99,11 @@ void sha1_hmac() {
 
     encoder->dispatchThreadgroups(grid_dims, group_dims);
     encoder->endEncoding();
-    encoder->release();
 
     cmd_buf->commit();
     cmd_buf->waitUntilCompleted();
-    cmd_buf->release();
 
     memcpy(hash, hash_buf->contents(), sizeof(hash));
-
-    hash_buf->release();
-
-    kernel->release();
-    func->release();
-    lib->release();
-    device->release();
-    devices->release();
 
     std::string exp = "f61a533909a63012da90f7e4b0924f5dcb8bd95f";
     std::string got = hash::bytes_to_digest((u8*)hash, sizeof(hash));
@@ -132,13 +115,13 @@ void sha1_hmac() {
 }
 
 void run() {
-    start_capture("metaling.gputrace");
+    // metal::start_capture("metaling.gputrace");
 
     printf("tests:\n");
     sha1();
     sha1_hmac();
 
-    stop_capture();
+    // metal::stop_capture();
 }
 
 }

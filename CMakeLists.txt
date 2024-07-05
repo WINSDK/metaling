@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(metaling)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -102,6 +102,7 @@ target_sources(metaling PRIVATE
     src/common.cc
     src/hash.cc
     src/backend/metal/metal.cc
+    src/backend/metal/hash.cc
     src/backend/cpu/hash.cc
     src/backend/cpu/cpu.cc
     src/backend/cpu/sha1.cc

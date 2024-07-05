@@ -1,4 +1,3 @@
-#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -12,6 +11,8 @@
 
 namespace fs = std::filesystem;
 
+namespace metal {
+
 constexpr auto get_metal_version() {
 #if defined METAL_3_2
     return MTL::LanguageVersion3_2;
@@ -22,7 +23,15 @@ constexpr auto get_metal_version() {
 #endif
 }
 
-MTL::Library* metal_read_lib(MTL::Device* device, std::string_view path) {
+std::unique_ptr<void, std::function<void(void*)>> new_scoped_memory_pool() {
+    auto dtor = [](void* ptr) { static_cast<NS::AutoreleasePool*>(ptr)->release(); };
+    return std::unique_ptr<void, std::function<void(void*)>>(
+        NS::AutoreleasePool::alloc()->init(), dtor);
+}
+
+MTL::Library* read_lib(MTL::Device* device, std::string_view path, std::string_view header) {
+    auto pool = new_scoped_memory_pool();
+
     if (!fs::exists(path) || !fs::is_regular_file(path))
         error("source '%s' does not exist or is not a regular file.\n", path.data());
 
@@ -38,6 +47,9 @@ MTL::Library* metal_read_lib(MTL::Device* device, std::string_view path) {
 
     file.close();
 
+    // Append header to the end (this might be a template instantiation for example).
+    code << header;
+
     auto ncode = NS::String::string(code.str().c_str(), NS::ASCIIStringEncoding);
 
     NS::Error* err = nullptr;
@@ -45,7 +57,6 @@ MTL::Library* metal_read_lib(MTL::Device* device, std::string_view path) {
     options->setLanguageVersion(get_metal_version());
 
     MTL::Library* lib = device->newLibrary(ncode, options, &err);
-    options->release();
 
     if (!lib)
         error_metal(err, "compiling src failed");
@@ -60,6 +71,8 @@ u64 align_size(u64 size) {
 }
 
 void start_capture(std::string path) {
+    auto pool = new_scoped_memory_pool();
+
     setenv("MTL_CAPTURE_ENABLED", "1", 0);
     fs::remove_all(path);
 
@@ -85,6 +98,9 @@ void start_capture(std::string path) {
 }
 
 void stop_capture() {
-  auto manager = MTL::CaptureManager::sharedCaptureManager();
-  manager->stopCapture();
+    auto pool = new_scoped_memory_pool();
+    auto manager = MTL::CaptureManager::sharedCaptureManager();
+    manager->stopCapture();
 }
+
+} // namespace metal

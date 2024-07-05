@@ -15,22 +15,6 @@ typedef int64_t i64;
 
 typedef float f32;
 
-struct GlobalContext {
-    u8 mac_ap[6];
-    u8 mac_sta[6];
-    u32 target_hash[5];
-
-    u8 pattern[64];
-    u64 pattern_len;
-
-    u64 thread_count;
-    u64 hashes_to_check;
-
-    u8 passphrase[64];
-    bool found_passphrase;
-    // device atomic<ulong> *total_hash_count;
-};
-
 void hmac_sha1_128_init(u32 ipad[16], u32 opad[16], const u32 key[16]) {
     for (u32 idx = 0; idx < 16; idx++) {
         u32 val = (idx * 4) | ((idx * 4 + 1) << 8) | ((idx * 4 + 2) << 16) | ((idx * 4 + 3) << 24);
@@ -87,7 +71,7 @@ void pmkid_msg_init(u8 msg[20], device const u8 mac_ap[6], device const u8 mac_s
 
 #define STAT_REPORT_INTERVAL 10000
 
-bool pmkid(device GlobalContext *ctx, u32 hash[5], thread u64 &hash_count, u8 msg[20], thread const u8 current[64]) {
+bool pmkid(u32 hash[5], thread u64 &hash_count, u8 msg[20], thread const u8 current[64]) {
     hmac_sha1_128(
         reinterpret_cast<thread const u32*>(current),
         reinterpret_cast<thread u32*>(msg),
@@ -159,14 +143,15 @@ inline void initialize_indices(u64 current_idx, u32 indices[], const u32 set_siz
 
 template <uint LEN>
 kernel void hash_and_generate_permutations(
-        device GlobalContext* ctx,
-        uint id [[thread_position_in_grid]]) {
+        device u8* passphrase,
+        device bool* found_passphrase,
+        uint id [[thread_position_in_grid]]
+        uint lsize [[threads_per_threadgroup]]) {
     u8 current[LEN] = {0};
-    u64 len = ctx->pattern_len;
-    u64 chunk_count = ctx->thread_count;
+    u64 chunk_count = lsize;
 
     if (id >= chunk_count)
-        return; // this is an error
+        return;
 
     // Precompute character sets for each position in the pattern.
     constant u8* char_sets[LEN];

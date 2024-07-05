@@ -9,9 +9,6 @@ namespace tests {
     void run();
 }
 
-// Assumption we make when casting strings.
-static_assert(sizeof(char) == sizeof(u8));
-
 const char* HELP = "failed to provide pattern, usage:\n"
                    "./metaling --test\n"
                    "           --help\n"

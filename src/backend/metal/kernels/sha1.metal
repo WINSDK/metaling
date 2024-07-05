@@ -1,10 +1,3 @@
-#include <metal_stdlib>
-using namespace metal;
-
-typedef uint8_t u8;
-typedef uint32_t u32;
-typedef uint64_t u64;
-
 inline u32 swap32(const u32 v) {
     return ((v & 0xff000000) >> 24) |
            ((v & 0x00ff0000) >> 8)  |
@@ -3119,201 +3112,84 @@ kernel void test_sha1_hmac(device u32 hash[5]) {
 
 /* ---------------------- SHA1 AND HMAC END ------------------------ */
 
-struct GlobalContext {
-    u8 mac_ap[6];
-    u8 mac_sta[6];
-    u32 target_hash[5];
-
-    u8 pattern[64];
-    u64 pattern_len;
-
-    u64 hashes_to_check;
-
-    u8 passphrase[64];
-    bool found_passphrase;
-    // device atomic<ulong> *total_hash_count;
-};
-
-// = "PMK Name" + mac_ap + mac_sta
-void pmkid_msg_init(u8 msg[20], device const u8 mac_ap[6], device const u8 mac_sta[6]) {
-    msg[0] = 'P';
-    msg[1] = 'M';
-    msg[2] = 'K';
-    msg[3] = ' ';
-    msg[4] = 'N';
-    msg[5] = 'a';
-    msg[6] = 'm';
-    msg[7] = 'e';
-
-    for (u64 idx = 0; idx < 6; idx++)
-        msg[idx + 8] = mac_ap[idx];
-
-    for (u64 idx = 0; idx < 6; idx++)
-        msg[idx + 14] = mac_sta[idx];
-}
-
 constant u64 STAT_REPORT_INTERVAL = 10000;
 
-bool pmkid(
-        device GlobalContext *ctx,
-        thread sha1_hmac_ctx *hmac_ctx,
-        thread u32 hash[5],
-        thread u64 &hash_count,
-        thread u8 msg[20],
-        thread const u8 current[64]) {
-
-    sha1_hmac_init(hmac_ctx, (thread const u32*)current, 64);
-    sha1_hmac_update(hmac_ctx, (thread u32*)msg, 20);
+bool pmkid(thread sha1_hmac_ctx *hmac_ctx, thread u32 hash[5], thread const u8 current[LEN]) {
+    sha1_hmac_init(hmac_ctx, (thread const u32*)current, LEN);
+    sha1_hmac_update(hmac_ctx, (thread const u32[])PMK_MSG, 20);
     sha1_hmac_final(hmac_ctx);
 
     #pragma unroll
     for (u64 idx = 0; idx < 5; idx++)
         hash[idx] = swap32(hmac_ctx->opad.h[idx]);
 
-    hash_count++;
-
-    if (hash_count == STAT_REPORT_INTERVAL) {
-        // u64 total_hash_count = atomic_load_explicit(ctx->total_hash_count, memory_order_relaxed);
-        // atomic_store_explicit(ctx->total_hash_count, total_hash_count + hash_count, memory_order_relaxed);
-        // atomic_fence();
-
-        ctx->found_passphrase = true;
-        hash_count = 0;
-    }
-
     #pragma unroll
     for (u64 idx = 0; idx < 5; idx++)
-        if (hash[idx] != ctx->target_hash[idx])
+        if (hash[idx] != TARGET_HASH[idx])
             // Keep looking for matching hashes.
             return true;
-
-    // Notify CPU of the passphrase we found.
-    #pragma unroll
-    for (u64 idx = 0; idx < 64; idx++)
-        ctx->passphrase[idx] = current[idx];
-    ctx->found_passphrase = true;
 
     return false;
 }
 
-constant u8 DIGITS[] =
-    "\0"
-    " "
-    "0123456789";
-constant u8 LOWERCASE[] =
-    "\0"
-    " "
-    "abcdefghijklmnopqrstuvwxyz";
-constant u8 UPPERCASE[] =
-    "\0"
-    " "
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-constant u8 ALPHA[] =
-    "\0"
-    " "
-    "abcdefghijklmnopqrstuvwxyz"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-constant u8 ALPHA_NUM[] =
-    "\0"
-    " "
-    "0123456789"
-    "abcdefghijklmnopqrstuvwxyz"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-constant u8 ANY[] =
-    "\0"
-    " "
-    "0123456789"
-    "abcdefghijklmnopqrstuvwxyz"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-
 // Function to initialize indices based on a given index.
-inline void initialize_indices(u64 current_idx, u32 indices[], const u32 set_sizes[], u64 len) {
-    for (u64 idx = 0; idx < len; idx++) {
-        u32 set_size = set_sizes[idx];
+inline void initialize_indices(u64 current_idx, thread u32 indices[LEN]) {
+    for (u64 idx = 0; idx < LEN; idx++) {
+        u32 set_size = SET_SIZES[idx];
         indices[idx] = current_idx % set_size;
         current_idx /= set_size;
     }
 }
 
-#define LEN 64
-
 kernel void hash_and_generate_permutations(
-        device GlobalContext* ctx,
+        device u8 passphrase[LEN],
+        device bool *found_passphrase,
+        device volatile atomic_uint *total_hash_count,
         uint id [[thread_position_in_grid]],
         uint tcount [[threads_per_grid]]) {
     u8 current[LEN] = {0};
-    u64 len = ctx->pattern_len;
-
-    // Precompute character sets for each position in the pattern.
-    constant u8* char_sets[LEN];
-    u32 set_sizes[LEN];
-
-    for (u64 idx = 0; idx < len; idx++) {
-        switch (ctx->pattern[idx]) {
-            case 'd':
-                char_sets[idx] = DIGITS;
-                set_sizes[idx] = sizeof(DIGITS);
-                break;
-            case 'l':
-                char_sets[idx] = LOWERCASE;
-                set_sizes[idx] = sizeof(LOWERCASE);
-                break;
-            case 'u':
-                char_sets[idx] = UPPERCASE;
-                set_sizes[idx] = sizeof(UPPERCASE);
-                break;
-            case 'a':
-                char_sets[idx] = ALPHA;
-                set_sizes[idx] = sizeof(ALPHA);
-                break;
-            case 'n':
-                char_sets[idx] = ALPHA_NUM;
-                set_sizes[idx] = sizeof(ALPHA_NUM);
-                break;
-            case '?':
-                char_sets[idx] = ANY;
-                set_sizes[idx] = sizeof(ANY);
-                break;
-            default:
-                return; // this is an error
-        }
-    }
-
-    // Calculate the total number of permutations.
-    u64 perms = 1;
-    for (u64 idx = 0; idx < len; ++idx)
-        perms *= set_sizes[idx];
 
     // Calculate the range of permutations this chunk will handle.
-    u64 stride = 1024 * 64;
-    u64 start_idx = id * stride;
-    u64 end_idx = perms;
+    u64 stride = 1024 * 64; // hyperparameter
+    u64 idx = id * stride;
 
-    // Initialize indices to start at start_index.
+    // Initialize indices such that we start checking hashes at `idx` offset into the pattern.
     u32 indices[LEN];
-    initialize_indices(start_idx, indices, set_sizes, len);
+    initialize_indices(idx, indices);
 
     u32 hash[5];
     u64 hash_count = 0;
 
-    u8 pmk_msg[20];
-    pmkid_msg_init(pmk_msg, ctx->mac_ap, ctx->mac_sta);
-
     sha1_hmac_ctx hmac_ctx;
 
-    while (start_idx < end_idx) {
+    while (idx < PERM_COUNT) {
         // Construct the current permutation based on indices.
-        for (u64 idx = 0; idx < len; idx++)
-            current[idx] = char_sets[idx][indices[idx]];
+        #pragma unroll
+        for (u64 idx = 0; idx < LEN; idx++)
+            current[idx] = CHAR_SETS[idx][indices[idx]];
 
-        if (!pmkid(ctx, &hmac_ctx, hash, hash_count, pmk_msg, current))
-            return;
+        // Periodically update hash_count.
+        if (hash_count == STAT_REPORT_INTERVAL) {
+            atomic_fetch_add_explicit(total_hash_count, hash_count, memory_order_relaxed);
+            hash_count = 0;
+        }
+
+        hash_count++;
+        idx++;
+
+        if (!pmkid(&hmac_ctx, hash, current)) {
+            // Notify CPU of the passphrase we found.
+            for (u64 idx = 0; idx < LEN; idx++)
+                passphrase[idx] = current[idx];
+            *found_passphrase = true;
+
+            break;
+        }
 
         // Increment indices from left to right.
         u64 pos = 0;
-        while (pos < len) {
-            if (indices[pos] < set_sizes[pos] - 1) {
+        while (pos < LEN) {
+            if (indices[pos] < SET_SIZES[pos] - 1) {
                 indices[pos]++;
                 break;
             } else {
@@ -3322,17 +3198,17 @@ kernel void hash_and_generate_permutations(
             }
         }
 
-        // All permutations generated
-        if (pos == len)
+        // All permutations were generated.
+        if (pos == LEN)
             break;
 
-        start_idx++;
 
         // If we've completed a stride, move to the next chunk's corresponding stride.
-        if (start_idx % stride == 0) {
-            start_idx += (tcount - 1) * stride;
-            initialize_indices(start_idx, indices, set_sizes, len);
+        if (idx % stride == 0) {
+            idx += (tcount - 1) * stride;
+            initialize_indices(idx, indices);
         }
     }
-}
 
+    atomic_fetch_add_explicit(total_hash_count, hash_count, memory_order_relaxed);
+}
